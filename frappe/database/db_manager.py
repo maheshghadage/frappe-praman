@@ -79,7 +79,7 @@ class DbManager:
 		if pipe:
 			print('Restoring Database file...')
 
-		command = '{pipe} mysql -u {user} -p{password} -h{host} ' + ('-P{port}' if frappe.db.port else '') + ' {target} {source}'
+		command = '{pipe} mysql -u {user} -p{password} --socket=/opt/mariadb-data/mariadb.sock ' + ('-P {port}' if frappe.db.port else '') + ' {target} {source}'
 		command = command.format(
 			pipe=pipe,
 			user=esc(user),
@@ -89,4 +89,5 @@ class DbManager:
 			source=source,
 			port=frappe.db.port
 		)
+
 		os.system(command)

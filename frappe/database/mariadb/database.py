@@ -72,6 +72,8 @@ class MariaDBDatabase(Database):
 		})
 
 		conn = pymysql.connect(
+			read_default_file="/opt/mariadb-data/my.cnf",
+			unix_socket="/opt/mariadb-data/mariadb.sock",
 			user=self.user or '',
 			password=self.password or '',
 			host=self.host,
