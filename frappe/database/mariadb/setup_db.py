@@ -5,16 +5,16 @@ import os, sys
 from frappe.database.db_manager import DbManager
 
 expected_settings_10_2_earlier = {
-	"innodb_file_format": "Barracuda",
-	"innodb_file_per_table": "ON",
-	"innodb_large_prefix": "ON",
-	"character_set_server": "utf8mb4",
-	"collation_server": "utf8mb4_unicode_ci"
+	#"innodb_file_format": "Barracuda",
+	#"innodb_file_per_table": "ON",
+	#"innodb_large_prefix": "ON",
+	#"character_set_server": "utf8mb4",
+	#"collation_server": "utf8mb4_unicode_ci"
 }
 
 expected_settings_10_3_later = {
-	"character_set_server": "utf8mb4",
-	"collation_server": "utf8mb4_unicode_ci"
+	#"character_set_server": "utf8mb4",
+	#"collation_server": "utf8mb4_unicode_ci"
 }
 
 
@@ -90,7 +90,6 @@ def bootstrap_database(db_name, verbose, source_sql=None):
 	if not check_database_settings():
 		print('Database settings do not match expected values; stopping database setup.')
 		sys.exit(1)
-
 	import_db_from_sql(source_sql, verbose)
 
 	frappe.connect(db_name=db_name)

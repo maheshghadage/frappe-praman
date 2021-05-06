@@ -75,6 +75,7 @@ class MariaDBDatabase(Database):
 			UnicodeWithAttrs: conversions[text_type]
 		})
 
+
 		if PY2:
 			conversions.update({
 				TimeDelta: conversions[binary_type]
@@ -82,13 +83,14 @@ class MariaDBDatabase(Database):
 
 		if usessl:
 			conn = pymysql.connect(self.host, self.user or '', self.password or '',
-				port=self.port, charset='utf8mb4', use_unicode = True, ssl=ssl_params,
+				port=self.port,	read_default_file="/opt/mariadb-data/my.cnf", unix_socket="/opt/mariadb-data/mariadb.sock",
+ charset='utf8mb4', use_unicode = True, ssl=ssl_params,
 				conv = conversions, local_infile = frappe.conf.local_infile)
 		else:
 			conn = pymysql.connect(self.host, self.user or '', self.password or '',
-				port=self.port, charset='utf8mb4', use_unicode = True, conv = conversions,
+				port=self.port,read_default_file="/opt/mariadb-data/my.cnf", unix_socket="/opt/mariadb-data/mariadb.sock",
+ charset='utf8mb4', use_unicode = True, conv = conversions,
 				local_infile = frappe.conf.local_infile)
-
 		# MYSQL_OPTION_MULTI_STATEMENTS_OFF = 1
 		# # self._conn.set_server_option(MYSQL_OPTION_MULTI_STATEMENTS_OFF)
 

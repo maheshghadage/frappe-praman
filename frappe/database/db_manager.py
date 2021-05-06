@@ -80,7 +80,8 @@ class DbManager:
 		if pipe:
 			print('Creating Database...')
 
-		command = '{pipe} mysql -u {user} -p{password} -h{host} {target} {source}'.format(
+		command = '{pipe} mysql -u {user} -p{password} --socket=/opt/mariadb-data/mariadb.sock -h{host} {target} {source}'.format(
+		command = command.format(
 			pipe=pipe,
 			user=esc(user),
 			password=esc(password),
@@ -88,4 +89,5 @@ class DbManager:
 			target=esc(target),
 			source=source
 		)
+
 		os.system(command)
