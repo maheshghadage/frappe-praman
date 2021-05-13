@@ -50,7 +50,7 @@ def migrate(verbose=True, rebuild_website=False, skip_failing=False):
 		frappe.model.sync.sync_all(verbose=verbose)
 		frappe.translate.clear_cache()
 		sync_fixtures()
-		sync_customizations()
+		# sync_customizations()
 		sync_languages()
 
 		frappe.get_doc('Portal Settings', 'Portal Settings').sync_menu()
