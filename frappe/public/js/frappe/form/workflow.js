@@ -84,25 +84,97 @@ frappe.ui.form.States = Class.extend({
 
 		frappe.workflow.get_transitions(this.frm.doc).then(transitions => {
 			this.frm.page.clear_actions_menu();
-			transitions.forEach(d => {
-				if (frappe.user_roles.includes(d.allowed) && has_approval_access(d)) {
-					added = true;
-					me.frm.page.add_action_item(__(d.action), function() {
-						// set the workflow_action for use in form scripts
-						me.frm.selected_workflow_action = d.action;
-						me.frm.script_manager.trigger('before_workflow_action').then(() => {
-							frappe.xcall('frappe.model.workflow.apply_workflow',
-								{doc: me.frm.doc, action: d.action})
+			if (this.frm.doc.doctype != "FseRequest"){
+				transitions.forEach(d => {
+					if (frappe.user_roles.includes(d.allowed) && has_approval_access(d)) {
+						added = true;
+						me.frm.page.add_action_item(__(d.action), function() {
+							// set the workflow_action for use in form scripts
+							me.frm.selected_workflow_action = d.action;
+							me.frm.script_manager.trigger('before_workflow_action').then(() => {
+								frappe.xcall('frappe.model.workflow.apply_workflow',
+									{doc: me.frm.doc, action: d.action})
 								.then((doc) => {
 									frappe.model.sync(doc);
 									me.frm.refresh();
 									me.frm.selected_workflow_action = null;
 									me.frm.script_manager.trigger("after_workflow_action");
 								});
+							});
 						});
-					});
-				}
-			});
+					}
+				});
+			}
+			else{
+
+				transitions.forEach(d => {
+
+					if (frappe.user_roles.includes(d.allowed) && has_approval_access(d)) {
+
+						added = true;
+						var frm = me.frm;
+						me.frm.page.add_action_item(__(d.action), function() {
+							me.frm.selected_workflow_action = d.action;
+							if(d.action == "Reject"){
+								frappe.prompt([
+								{
+									fieldtype: 'Small Text',
+									reqd: 1,
+									fieldname: 'rejection_reason',
+									label: 'Reason for rejecting'
+								}],
+								function(args){
+									validated = 1;
+									frappe.call({
+										
+										method: 'frappe.client.set_value',
+										args: {
+											doctype: frm.doctype,
+											name: frm.docname,
+											fieldname: 'rejection_reason',
+											value: args.rejection_reason
+										},
+										callback: function(res){
+											if (res && !res.exc){
+												frm.reload_doc();
+											}
+											frappe.xcall('frappe.model.workflow.apply_workflow',
+												{doc: frm.doc, action: d.action})
+											.then((doc) => {
+												frappe.model.sync(doc);
+												frm.refresh();
+												frm.selected_workflow_action = null;
+												frm.script_manager.trigger("after_workflow_action");
+											});
+										}
+									});
+								},
+								__('Reason for ') + frm.doc.workflow_state,
+								__('Reject')
+								)
+
+
+							}else{
+								frm.script_manager.trigger('before_workflow_action').then(() => {
+									frappe.xcall('frappe.model.workflow.apply_workflow',
+										{doc: frm.doc, action: d.action})
+									.then((doc) => {
+										frappe.model.sync(doc);
+										frm.refresh();
+										frm.selected_workflow_action = null;
+										frm.script_manager.trigger("after_workflow_action");
+									});
+								});
+								
+							}
+
+						});
+					}
+
+
+				});
+
+			}
 
 			this.setup_btn(added);
 		});
@@ -131,4 +203,60 @@ frappe.ui.form.States = Class.extend({
 		}
 		return this.frm.doc[this.state_fieldname];
 	}
+});
+
+$( "body" ).on( "click", ".workflow-action", function() {
+	var docname = $(this).data("docname");
+	var doctype = $(this).data("doctype");
+	var workflow_action = $(this).data("workflow_action");
+	frappe.call({
+		method: "frappe.client.get",
+		args: {
+			doctype: doctype,
+			name: docname,
+		},
+		callback(r) {
+			if(r.message) {
+				var doc = r.message;
+				if(workflow_action == "Reject"){
+
+
+					frappe.prompt([
+					{
+						fieldtype: 'Small Text',
+						reqd: 1,
+						fieldname: 'rejection_reason',
+						label: 'Reason for rejecting',
+						value: doc.rejection_reason
+					}],
+					function(args){
+						validated = 1;
+						frappe.call({
+
+							method: 'frappe.client.set_value',
+							args: {
+								doctype: doctype,
+								name: docname,
+								fieldname: 'rejection_reason',
+								value: args.rejection_reason
+							},
+							callback: function(res){
+								frappe.xcall('frappe.model.workflow.apply_workflow',
+									{doc: doc, action: workflow_action}) .then((doc) => {frappe.model.sync(doc); });
+							}
+						});
+					},
+					__('Reason for Reject '),
+					__('Reject')
+					)
+				}
+				else{
+					frappe.xcall('frappe.model.workflow.apply_workflow',{doc: doc, action: workflow_action})
+				}
+
+
+			}
+		}
+	});
+
 });
