@@ -144,7 +144,7 @@ def get_doc_permissions(doc, user=None, ptype=None):
 			permissions = {}
 	if is_user_owner():
 		uroles = frappe.get_roles(user)
-		if ("Fse" in uroles and doc.doctype == "Customer" and (doc.write_granted == 1 or doc.status ==  "Not Verified" )):
+		if ("Field Sales Executive" in uroles and doc.doctype == "Customer" and (doc.write_granted == 1 or doc.status ==  "Not Verified" )):
 			permissions['write'] = 1
 
 	return permissions
