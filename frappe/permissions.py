@@ -142,13 +142,10 @@ def get_doc_permissions(doc, user=None, ptype=None):
 			permissions['create'] = 0
 		else:
 			permissions = {}
-			
 	if is_user_owner():
 		uroles = frappe.get_roles(user)
-		if ("Finance" in uroles and doc.doctype == "Customer"):
-			user_permission_names = frappe.db.sql("""select name from `tabUser Permission` where allow="{}" AND for_value="{}" AND user="{}" LIMIT 1""".format("Customer", doc.name, user))
-			if(len(user_permission_names) > 0):
-				permissions['write'] = 1
+		if ("Fse" in uroles and doc.doctype == "Customer" and (doc.write_granted == 1 or doc.status ==  "Not Verified" )):
+			permissions['write'] = 1
 
 	return permissions
 
