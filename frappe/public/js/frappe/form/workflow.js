@@ -180,7 +180,10 @@ frappe.ui.form.States = Class.extend({
 	}
 });
 
-$( "body" ).on( "click", ".workflow-action", function() {
+$( "body" ).on( "click", ".workflow-action", function(e) {
+	e.stopPropagation();
+	e.preventDefault();
+
 	var docname = $(this).data("docname");
 	var doctype = $(this).data("doctype");
 	var workflow_action = $(this).data("workflow_action");
