@@ -75,7 +75,10 @@ def as_raw():
 	return response
 
 def as_json():
-	make_logs()
+	if frappe.request.path.startswith("/api/method/praman_app"):
+		make_api_logs()
+	else:
+		make_logs()
 	response = Response()
 	if frappe.local.response.http_status_code:
 		response.status_code = frappe.local.response['http_status_code']
@@ -84,6 +87,12 @@ def as_json():
 	response.mimetype = 'application/json'
 	response.charset = 'utf-8'
 	response.data = json.dumps(frappe.local.response, default=json_handler, separators=(',',':'))
+
+	# if frappe.local.response.get("is_custom_api_response"):
+	# 	response.data = json.dumps(frappe.local.response['message'], default=json_handler, separators=(',',':'))
+	# else:
+	# 	response.data = json.dumps(frappe.local.response, default=json_handler, separators=(',',':'))
+	
 	return response
 
 def as_pdf():
@@ -118,6 +127,32 @@ def make_logs(response = None):
 
 	if frappe.flags.error_message:
 		response['_error_message'] = frappe.flags.error_message
+
+def make_api_logs(response = None):
+	"""make strings for msgprint and errprint"""
+	if not response:
+		response = frappe.local.response
+	if frappe.error_log :
+		response["status"] = response["status"] if response.get("status") else "failure"
+		response["message"] = response["message"] if response.get("message") else "Internal Server error"
+	elif response.get('exc_type') or response.get('exc'):
+		response["status"] = response["status"] if response.get("status") else "failure"
+		response["message"] = response["message"] if response.get("message") else "Internal Server error"
+		
+
+	#if frappe.error_log :	
+		#response['exc'] = json.dumps([frappe.utils.cstr(d["exc"]) for d in frappe.local.error_log])
+
+	# if frappe.local.message_log:
+		# response['_server_messages'] = json.dumps([frappe.utils.cstr(d) for
+		# 	d in frappe.local.message_log])
+
+	# if frappe.debug_log and frappe.conf.get("logging") or False:
+		# response['_debug_messages'] = json.dumps(frappe.local.debug_log)
+
+	# if frappe.flags.error_message:
+		# response['_error_message'] = frappe.flags.error_message
+
 
 def json_handler(obj):
 	"""serialize non-serializable data for json"""
