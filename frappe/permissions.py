@@ -146,6 +146,10 @@ def get_doc_permissions(doc, user=None, ptype=None):
 		uroles = frappe.get_roles(user)
 		if ("Field Sales Executive" in uroles and doc.doctype == "Customer" and (doc.write_granted == 1 or doc.status ==  "Not Verified" )):
 			permissions['write'] = 1
+		elif ("Field Sales Executive" in uroles  and (doc.doctype == "Address" or doc.doctype == "Contact") and doc.link_doctype == "Customer" ):
+			cust_doc = frappe.get_doc("Customer", doc.link_name) if frappe.db.exists({'doctype': 'Customer', "name": doc.link_name}) else None
+			if(cust_doc.write_granted == 1 or cust_doc.status ==  "Not Verified"):
+				permissions['write'] = 1
 
 	return permissions
 
