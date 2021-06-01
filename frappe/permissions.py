@@ -144,11 +144,16 @@ def get_doc_permissions(doc, user=None, ptype=None):
 			permissions = {}
 	if is_user_owner():
 		uroles = frappe.get_roles(user)
-		if ("Field Sales Executive" in uroles and doc.doctype == "Customer" and (doc.write_granted == 1 or doc.status ==  "Not Verified" )):
+		if ("Field Sales Executive" in uroles and doc.doctype == "Customer" and (doc.write_granted == 1 or doc.status ==  "Not Verified"  or doc.status ==  "Rejected" )):
 			permissions['write'] = 1
-		elif ("Field Sales Executive" in uroles  and (doc.doctype == "Address" or doc.doctype == "Contact") and doc.link_doctype == "Customer" ):
-			cust_doc = frappe.get_doc("Customer", doc.link_name) if frappe.db.exists({'doctype': 'Customer', "name": doc.link_name}) else None
-			if(cust_doc.write_granted == 1 or cust_doc.status ==  "Not Verified"):
+		#elif elif ("Field Sales Executive" in uroles  and (doc.doctype == "Address" or doc.doctype == "Contact") and doc.link_doctype == "Customer" ):
+		elif ("Field Sales Executive" in uroles  and ( doc.doctype == "Contact") ):
+			custom_doc_fields = frappe.db.sql("""select cu.write_granted, cu.status from `tabCustomer` c INNER JOIN `tabDynamic Link` cl ON cu.name = cl.link_name AND cl.link_doctype = 'Customer' INNER JOIN `tabContact` c ON c.name = cl.parent AND cl.parenttype = 'Contact' where c.name = "{}" limit 1 """.format(doc.name), as_list=1)
+			if (len(custom_doc_fields != 0) and (custom_doc_fields[0][0] or custom_doc_fields[0][1] == "Not Verified" or custom_doc_fields[0][1] == "Rejected")):
+				permissions['write'] = 1
+		elif ("Field Sales Executive" in uroles  and ( doc.doctype == "Contact Phone") ):
+			custom_doc_fields = frappe.db.sql("""select cu.write_granted, cu.status from `tabCustomer` c INNER JOIN `tabDynamic Link` cl ON cu.name = cl.link_name AND cl.link_doctype = 'Customer' INNER JOIN `tabContact` c ON c.name = cl.parent AND cl.parenttype = 'Contact' INNER JOIN `tabContact Phone` cp  ON c.name = cp.parent AND cp.parenttype = 'Contact'  where cp.name = "{}" limit 1 """.format(doc.name), as_list=1)
+			if (len(custom_doc_fields != 0) and (custom_doc_fields[0][0] or custom_doc_fields[0][1] == "Not Verified" or custom_doc_fields[0][1] == "Rejected" )):
 				permissions['write'] = 1
 
 	return permissions
