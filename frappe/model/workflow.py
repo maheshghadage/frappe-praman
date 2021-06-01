@@ -74,9 +74,11 @@ def is_transition_condition_satisfied(transition, doc):
 		return frappe.safe_eval(transition.condition, get_workflow_safe_globals(), dict(doc=doc.as_dict()))
 
 @frappe.whitelist()
-def apply_workflow(doc, action):
+def apply_workflow(doc, action, rejection_reason=None):
 	'''Allow workflow action on the current doc'''
-	doc = frappe.get_doc(frappe.parse_json(doc))
+	# doc = frappe.get_doc(frappe.parse_json(doc))
+	parsed_json =  frappe.parse_json(doc)
+	doc = frappe.get_doc(parsed_json.get("doctype"), parsed_json.get("name"))
 	workflow = get_workflow(doc.doctype)
 	transitions = get_transitions(doc, workflow)
 	user = frappe.session.user
@@ -96,8 +98,14 @@ def apply_workflow(doc, action):
 	# update workflow state field
 	doc.set(workflow.workflow_state_field, transition.next_state)
 
+
+
 	# find settings for the next state
 	next_state = [d for d in workflow.states if d.state == transition.next_state][0]
+
+
+	if(transition.next_state  ==  "Rejected"):
+		doc.set("rejection_reason", rejection_reason)
 
 	# update any additional field
 	if next_state.update_field:

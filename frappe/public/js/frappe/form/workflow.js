@@ -102,29 +102,16 @@ frappe.ui.form.States = Class.extend({
 							}],
 							function(args){
 								validated = 1;
-								frappe.call({
-									
-									method: 'frappe.client.set_value',
-									args: {
-										doctype: frm.doctype,
-										name: frm.docname,
-										fieldname: 'rejection_reason',
-										value: args.rejection_reason
-									},
-									callback: function(res){
-										if (res && !res.exc){
-											frm.reload_doc();
-										}
-										frappe.xcall('frappe.model.workflow.apply_workflow',
-											{doc: frm.doc, action: d.action})
-										.then((doc) => {
-											frappe.model.sync(doc);
-											frm.refresh();
-											frm.selected_workflow_action = null;
-											frm.script_manager.trigger("after_workflow_action");
-										});
-									}
+								
+								frappe.xcall('frappe.model.workflow.apply_workflow',
+									{doc: frm.doc, action: d.action, rejection_reason: args.rejection_reason})
+								.then((doc) => {
+									frappe.model.sync(doc);
+									frm.refresh();
+									frm.selected_workflow_action = null;
+									frm.script_manager.trigger("after_workflow_action");
 								});
+								
 							},
 							__('Reason for ') + frm.doc.workflow_state,
 							__('Reject')
@@ -209,20 +196,8 @@ $( "body" ).on( "click", ".workflow-action", function(e) {
 					}],
 					function(args){
 						validated = 1;
-						frappe.call({
-
-							method: 'frappe.client.set_value',
-							args: {
-								doctype: doctype,
-								name: docname,
-								fieldname: 'rejection_reason',
-								value: args.rejection_reason
-							},
-							callback: function(res){
-								frappe.xcall('frappe.model.workflow.apply_workflow',
-									{doc: doc, action: workflow_action}) .then((doc) => {frappe.model.sync(doc); });
-							}
-						});
+						frappe.xcall('frappe.model.workflow.apply_workflow',
+							{doc: doc, action: workflow_action, rejection_reason: args.rejection_reason}) .then((doc) => {frappe.model.sync(doc); });
 					},
 					__('Reason for Reject '),
 					__('Reject')
