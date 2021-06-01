@@ -56,6 +56,7 @@ def application(request):
 		frappe.recorder.record()
 		frappe.monitor.start()
 		frappe.rate_limiter.apply()
+		
 		frappe.api.validate_auth()
 
 		if request.method == "OPTIONS":
@@ -112,7 +113,6 @@ def application(request):
 
 		process_response(response)
 		frappe.destroy()
-
 	return response
 
 def init_request(request):
@@ -199,7 +199,12 @@ def make_form_dict(request):
 
 def handle_exception(e):
 	response = None
-	http_status_code = getattr(e, "http_status_code", 500)
+	if (frappe.request.path == "/api/method/praman_app.utils.api.custom_login" and getattr(e, "http_status_code", 401) == 401):
+		http_status_code = 200
+	elif (frappe.request.path == "/api/method/frappe.core.doctype.user.user.reset_password" and getattr(e, "http_status_code", 417) == 417):
+		http_status_code = 200
+	else:
+		http_status_code = getattr(e, "http_status_code", 500)
 	return_as_message = False
 	accept_header = frappe.get_request_header("Accept") or ""
 	respond_as_json = (
