@@ -336,7 +336,8 @@ class User(Document):
 			'user': self.name,
 			'title': subject,
 			'login_url': get_url(),
-			'created_by': created_by
+			'created_by': created_by,
+			'fse':self.fse
 		}
 
 		args.update(add_args)
@@ -859,7 +860,7 @@ def sign_up(email, full_name, redirect_to):
 			"email": email,
 			"first_name": escape_html(full_name),
 			"enabled": 1,
-			"new_password": random_string(10),
+			"new_password":"praman",
 			"user_type": "Website User"
 		})
 		user.flags.ignore_permissions = True
@@ -1227,3 +1228,30 @@ def generate_keys(user):
 def switch_theme(theme):
 	if theme in ["Dark", "Light"]:
 		frappe.db.set_value("User", frappe.session.user, "desk_theme", theme)
+
+
+@frappe.whitelist()
+def role_add_owner(doc,method):
+	if doc.name!=None and doc.owner=="Administrator" and doc.fse==1:
+		user=frappe.get_doc('User',doc.name)
+		user.set('roles', [])
+		user.add_roles('Field Sales Executive')
+		_update_password(user=doc.name, pwd="Praman@123", logout_all_sessions=doc.logout_all_sessions)
+		#user.db_set("roles",roles, update_modified=False)
+		frappe.db.commit()
+
+	else:
+		user=frappe.get_doc('User',doc.name)
+		user.set('roles', [])
+		frappe.db.commit()
+
+
+
+@frappe.whitelist()
+def get_user_fse(doctype, txt, searchfield, start, page_len, filters):
+	return frappe.db.sql("""
+		select u.name, concat(u.first_name, ' ', u.last_name)
+		from tabUser u, `tabHas Role` r
+		where u.name = r.parent and r.role = 'Field Sales Executive' 
+		and u.enabled = 1 and u.name like %s
+		""", ("%" + txt + "%"))

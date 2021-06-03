@@ -180,7 +180,10 @@ doc_events = {
 	"Page": {
 		"after_insert": "frappe.cache_manager.build_domain_restriced_page_cache",
 		"after_save": "frappe.cache_manager.build_domain_restriced_page_cache",
-	}
+	},
+	"User": {
+		"after_insert":"frappe.core.doctype.user.user.role_add_owner",
+	},
 }
 
 scheduler_events = {

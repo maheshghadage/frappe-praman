@@ -151,7 +151,7 @@ def validate_auth():
 	Authenticate and sets user for the request.
 	"""
 	authorization_header = frappe.get_request_header("Authorization", str()).split(" ")
-
+	frappe.logger().debug(f"8888888888888888: auth header: {authorization_header}......... len header: {len(authorization_header)}")
 	if len(authorization_header) == 2:
 		validate_oauth(authorization_header)
 		validate_auth_via_api_keys(authorization_header)
@@ -170,6 +170,7 @@ def validate_oauth(authorization_header):
 	from frappe.integrations.oauth2 import get_oauth_server
 	from frappe.oauth import get_url_delimiter
 
+	frappe.logger().debug(f"&&&&&&&&&&&&&&&&& in validate oauth")
 	form_dict = frappe.local.form_dict
 	token = authorization_header[1]
 	req = frappe.request
@@ -184,11 +185,14 @@ def validate_oauth(authorization_header):
 
 	try:
 		required_scopes = frappe.db.get_value("OAuth Bearer Token", token, "scopes").split(get_url_delimiter())
+		frappe.logger().debug(f"&&&&&&&&&&&&&&&&& before valid")
 		valid, oauthlib_request = get_oauth_server().verify_request(uri, http_method, body, headers, required_scopes)
+		frappe.logger().debug(f"&&&&&&&&&&&&&&&&& valid:{valid},,,, {(frappe.db.get_value('OAuth Bearer Token', token, 'user'))}")
 		if valid:
 			frappe.set_user(frappe.db.get_value("OAuth Bearer Token", token, "user"))
 			frappe.local.form_dict = form_dict
 	except AttributeError:
+		frappe.logger().debug(f"&&&&&&&&&&&&&&&&&&&&&&&{frappe.utils.get_traceback()} &&&&&&&&&&")
 		pass
 
 

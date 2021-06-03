@@ -1,3 +1,25 @@
+{% if fse  %}
+	<p>
+	{{_("Hello")}} {{ first_name }}{% if last_name %} {{ last_name}}{% endif %},
+</p>
+{% set site_link = "<a href='" + site_url + "'>" + site_url + "</a>" %}
+<p>{{_("A new account has been created for you at {0}").format(site_link)}}.</p>
+<p>{{_("Your login id is")}}: <b>{{ user }}</b>
+<p>{{_("Your login password is")}}: <b>{{_("Praman@123")}}</b>
+
+
+
+{% if created_by != "Administrator" %}
+<br>
+<p style="margin-top: 15px">
+	{{_("Thanks")}},<br>
+	{{ created_by }}
+</p>
+{% endif %}
+<br>
+
+
+{% else %}
 <p>
 	{{_("Hello")}} {{ first_name }}{% if last_name %} {{ last_name}}{% endif %},
 </p>
@@ -22,3 +44,6 @@
 	{{_("You can also copy-paste following link in your browser")}}<br>
 	<a href="{{ link }}">{{ link }}</a>
 </p>
+
+
+{% endif %}

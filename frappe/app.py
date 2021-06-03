@@ -56,9 +56,11 @@ def application(request):
 		frappe.recorder.record()
 		frappe.monitor.start()
 		frappe.rate_limiter.apply()
-		
+		if request.path.startswith("/api/method/praman_app"):
+			frappe.logger().debug(f"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& request: {request.path},,,")
 		frappe.api.validate_auth()
 
+		frappe.logger().debug(f"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&session user: {frappe.session.user}")
 		if request.method == "OPTIONS":
 			response = Response()
 
@@ -87,6 +89,7 @@ def application(request):
 		response = frappe.utils.response.handle_session_stopped()
 
 	except Exception as e:
+		frappe.logger().debug(frappe.get_traceback())
 		response = handle_exception(e)
 
 	else:
@@ -215,6 +218,7 @@ def handle_exception(e):
 		)
 	)
 
+	frappe.logger().debug(f"&&&&&&&&&&&&&&&&&&&&&&&{frappe.utils.get_traceback()} &&&&&&&&&&")
 	if frappe.conf.get('developer_mode'):
 		# don't fail silently
 		print(frappe.get_traceback())

@@ -223,8 +223,10 @@ class OAuthWebRequestValidator(RequestValidator):
 		# Remember to check expiration and scope membership
 		otoken = frappe.get_doc("OAuth Bearer Token", token)
 		token_expiration_local = otoken.expiration_time.replace(tzinfo=pytz.timezone(frappe.utils.get_time_zone()))
-		token_expiration_utc = token_expiration_local.astimezone(pytz.utc)
-		is_token_valid = (frappe.utils.datetime.datetime.utcnow().replace(tzinfo=pytz.utc) < token_expiration_utc) \
+		#token_expiration_utc = token_expiration_local.astimezone(pytz.utc)
+		currenttime = frappe.utils.datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone(frappe.utils.get_time_zone())).replace(tzinfo=pytz.timezone(frappe.utils.get_time_zone()))
+		frappe.logger().debug(f"----------&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&-- currenttime: {currenttime} ,,,,,, expilocal:{token_expiration_local}")
+		is_token_valid = (frappe.utils.datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone(frappe.utils.get_time_zone())).replace(tzinfo=pytz.timezone(frappe.utils.get_time_zone())) < token_expiration_local) \
 			and otoken.status != "Revoked"
 		client_scopes = frappe.db.get_value("OAuth Client", otoken.client, 'scopes').split(get_url_delimiter())
 		are_scopes_valid = True
