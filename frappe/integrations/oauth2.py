@@ -15,7 +15,7 @@ from frappe.integrations.doctype.oauth_provider_settings.oauth_provider_settings
 def get_oauth_server():
 	if not getattr(frappe.local, 'oauth_server', None):
 		oauth_validator = OAuthWebRequestValidator()
-		frappe.local.oauth_server = WebApplicationServer(oauth_validator)
+		frappe.local.oauth_server = WebApplicationServer(oauth_validator, token_expires_in=900)
 
 	return frappe.local.oauth_server
 
@@ -105,13 +105,73 @@ def get_token(*args, **kwargs):
 
 	try:
 		r = frappe.request
-		headers, body, status = get_oauth_server().create_token_response(
-			r.url,
-			r.method,
-			r.form,
-			r.headers,
-			frappe.flags.oauth_credentials
-		)
+		#custom code for token 
+		urls="http://staging.praman.ai/api/method/frappe.integrations.oauth2.get_token"
+		custom_form=r.form
+		data_dict=custom_form.to_dict(flat=False)
+		data_key=list(data_dict.keys())
+		base_url=frappe.db.sql("""select base_url from `tabSocial Login Key` LIMIT 1 """, as_dict=1)
+		base_url=base_url[0]['base_url']
+		end="api/method/frappe.www.login.login_via_frappe"
+		frappe_via=base_url+end
+		client_id=frappe.db.sql("""select client_id from `tabSocial Login Key` where redirect_url="{}" LIMIT 1 """.format(frappe_via), as_dict=1)
+		if len(data_key)==2:
+			if data_key[0]=='username':
+				usr=data_dict['username']
+				pwd=data_dict['password']
+				data_json={'grant_type': 'password',
+					'username': 'administrator',
+					'password': 'admin',
+					'scope': 'all',
+					'client_id':client_id[0]['client_id']}
+				data_json['username']=usr[0]
+				data_json['password']=pwd[0]
+				header= {
+					'Cookie': 'full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_image='
+				}
+				frappe.logger().debug(f"form data 2 key== {data_json}")
+				frappe.logger().debug(f"urls-------- {urls}")
+				frappe.logger().debug(f" headers 2 key  { header}")
+
+				headers, body, status = get_oauth_server().create_token_response(
+				urls,
+				"POST",
+				data_json,
+				header,
+				frappe.flags.oauth_credentials
+				)
+		#refresh token custom
+		elif len(data_key)==1:
+			if data_key[0]=="refresh_token":
+				ref_token=data_dict['refresh_token']
+				data_json={'refresh_token': 'nerNoHhAFOUWTXsixopCe7OcST4qbC',
+					'grant_type': 'refresh_token',
+					'redirect_uri':'http://staging.praman.ai/api/method/frappe.www.login.login_via_frappe',
+					'client_id': '0399ec04da'}
+
+				data_json['refresh_token']=ref_token[0]
+				data_json['client_id']=client_id[0]['client_id']
+				header = {
+						'Cookie': 'full_name=Guest; sid=Guest; system_user=no; user_id=Guest; user_image='
+					}
+				print(data_json,'form')
+				print('head', header)
+				frappe.logger().debug(f"form refresh token dataaaaaa== {data_json}")
+				headers, body, status = get_oauth_server().create_token_response(
+				urls,
+				"POST",
+				data_json,
+				header,
+				frappe.flags.oauth_credentials
+				)
+		else:
+			frappe.logger().debug(f"url--------  {r.url}")
+			frappe.logger().debug(f"r.form  {r.form}")
+			frappe.logger().debug(f"headers   {r.headers}")
+			headers, body, status = get_oauth_server().create_token_response(
+				r.url, r.method, r.form, r.headers, frappe.flags.oauth_credentials
+			)
+
 		out = frappe._dict(json.loads(body))
 		if not out.error and "openid" in out.scope:
 			token_user = frappe.db.get_value("OAuth Bearer Token", out.access_token, "user")
@@ -134,7 +194,7 @@ def get_token(*args, **kwargs):
 
 			id_token_encoded = jwt.encode(id_token, client_secret, algorithm='HS256', headers=id_token_header)
 			out.update({"id_token": frappe.safe_decode(id_token_encoded)})
-
+		frappe.logger().debug(f"888888888888888 {out}")
 		frappe.local.response = out
 
 	except FatalClientError as e:
@@ -153,8 +213,12 @@ def revoke_token(*args, **kwargs):
 
 	frappe.local.response['http_status_code'] = status
 	if status == 200:
+		frappe.local.response["message"] = ""
+		frappe.local.response["status"] = "success"
 		return "success"
 	else:
+		frappe.local.response["message"] = "bad request"
+		frappe.local.response["status"] = "failure"
 		return "bad request"
 
 @frappe.whitelist()

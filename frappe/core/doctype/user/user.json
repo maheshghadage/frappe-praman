@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "enabled",
+  "fse",
   "section_break_3",
   "email",
   "last_name",
@@ -22,6 +23,7 @@
   "send_welcome_email",
   "unsubscribed",
   "user_image",
+  "roles_all",
   "sb1",
   "role_profile_name",
   "roles_html",
@@ -602,6 +604,19 @@
    "fieldtype": "Link",
    "label": "Module Profile",
    "options": "Module Profile"
+  },
+  {
+   "fieldname": "roles_all",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Roles "
+  },
+  {
+   "default": "0",
+   "fieldname": "fse",
+   "fieldtype": "Check",
+   "label": "FSE"
   }
  ],
  "icon": "fa fa-user",
@@ -670,7 +685,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-02-02 16:11:06.037543",
+ "modified": "2021-05-31 09:51:31.178034",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
@@ -697,7 +712,6 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "route": "user",
  "search_fields": "full_name",
  "show_name_in_global_search": 1,

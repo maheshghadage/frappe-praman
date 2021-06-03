@@ -21,7 +21,7 @@ from frappe.utils import cint
 from six import text_type
 from six.moves.urllib.parse import quote
 from frappe.core.doctype.access_log.access_log import make_access_log
-
+import re
 
 def report_error(status_code):
 	'''Build error. Show traceback in developer mode'''
@@ -109,16 +109,29 @@ def as_binary():
 	response.headers["Content-Disposition"] = ("filename=\"%s\"" % frappe.response['filename'].replace(' ', '_')).encode("utf-8")
 	response.data = frappe.response['filecontent']
 	return response
-
+stop=0
 def make_logs(response = None):
 	"""make strings for msgprint and errprint"""
 	if not response:
 		response = frappe.local.response
 
 	if frappe.error_log:
+		global stop
+		stop=3
 		response['exc'] = json.dumps([frappe.utils.cstr(d["exc"]) for d in frappe.local.error_log])
 
 	if frappe.local.message_log:
+		if (frappe.request.path.startswith("/api/method/praman_app") or frappe.request.path == "/api/method/frappe.core.doctype.user.user.reset_password"):
+			m=frappe.local.message_log
+			s=m[0]
+			s=s[12:]
+			matches=re.findall(r'\"(.+?)\"',s)
+			if stop==3:
+				response['status']="failure"
+			else:
+				response['status']="success"
+		
+			response['message']=matches[0]
 		response['_server_messages'] = json.dumps([frappe.utils.cstr(d) for
 			d in frappe.local.message_log])
 
