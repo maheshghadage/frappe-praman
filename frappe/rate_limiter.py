@@ -108,7 +108,7 @@ def rate_limit(key: str, limit: Union[int, Callable] = 5, seconds: int= 24*60*60
 				return frappe.call(fun, **frappe.form_dict)
 
 			_limit = limit() if callable(limit) else limit
-			_limit=100
+			_limit=10
 
 			identity = frappe.form_dict[key]
 			cache_key = f"rl:{frappe.form_dict.cmd}:{identity}"
