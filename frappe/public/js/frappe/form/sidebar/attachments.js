@@ -73,11 +73,11 @@ frappe.ui.form.Attachments = Class.extend({
 		let remove_action = null;
 		if (frappe.model.can_write(this.frm.doctype, this.frm.name)) {
 			remove_action = function(target_id) {
-				frappe.confirm(__("Are you sure you want to delete the attachment?"),
-					function() {
-						me.remove_attachment(target_id);
-					}
-				);
+				//frappe.confirm(__("Are you sure you want to delete the attachment?"),
+					//function() {
+					//	me.remove_attachment(target_id);
+					//}
+				//);
 				return false;
 			};
 		}
