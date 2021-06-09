@@ -82,7 +82,8 @@
   "api_key",
   "generate_keys",
   "column_break_65",
-  "api_secret"
+  "api_secret",
+  "user_id"
  ],
  "fields": [
   {
@@ -617,6 +618,12 @@
    "fieldname": "fse",
    "fieldtype": "Check",
    "label": "FSE"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Int",
+   "label": "user_id",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-user",
@@ -685,7 +692,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-05-31 09:51:31.178034",
+ "modified": "2021-06-09 20:13:55.887191",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
