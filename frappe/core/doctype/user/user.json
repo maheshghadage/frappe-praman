@@ -83,7 +83,8 @@
   "generate_keys",
   "column_break_65",
   "api_secret",
-  "user_id"
+  "user_id",
+  "section_break_78"
  ],
  "fields": [
   {
@@ -624,6 +625,11 @@
    "fieldtype": "Int",
    "label": "user_id",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_78",
+   "fieldtype": "Section Break",
+   "hidden": 1
   }
  ],
  "icon": "fa fa-user",
@@ -692,7 +698,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-09 20:13:55.887191",
+ "modified": "2021-06-10 21:29:42.125234",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
