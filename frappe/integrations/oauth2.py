@@ -11,6 +11,7 @@ import frappe
 from frappe import _
 from frappe.oauth import OAuthWebRequestValidator, WebApplicationServer
 from frappe.integrations.doctype.oauth_provider_settings.oauth_provider_settings import get_oauth_settings
+from praman_app.appsettings.config import config as settings
 
 def get_oauth_server():
 	if not getattr(frappe.local, 'oauth_server', None):
@@ -106,7 +107,7 @@ def get_token(*args, **kwargs):
 	try:
 		r = frappe.request
 		#custom code for token 
-		urls="http://staging.praman.ai/api/method/frappe.integrations.oauth2.get_token"
+		urls=f"{settings['host_url']}/api/method/frappe.integrations.oauth2.get_token"
 		custom_form=r.form
 		data_dict=custom_form.to_dict(flat=False)
 		data_key=list(data_dict.keys())
@@ -146,7 +147,7 @@ def get_token(*args, **kwargs):
 				ref_token=data_dict['refresh_token']
 				data_json={'refresh_token': 'nerNoHhAFOUWTXsixopCe7OcST4qbC',
 					'grant_type': 'refresh_token',
-					'redirect_uri':'http://staging.praman.ai/api/method/frappe.www.login.login_via_frappe',
+					'redirect_uri':f"{settings['host_url']}/api/method/frappe.www.login.login_via_frappe",
 					'client_id': '0399ec04da'}
 
 				data_json['refresh_token']=ref_token[0]
