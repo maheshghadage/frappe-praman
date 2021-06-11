@@ -24,6 +24,7 @@
   "unsubscribed",
   "user_image",
   "roles_all",
+  "date_created",
   "sb1",
   "role_profile_name",
   "roles_html",
@@ -630,6 +631,14 @@
    "fieldname": "section_break_78",
    "fieldtype": "Section Break",
    "hidden": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "date_created",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date ",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-user",
@@ -698,7 +707,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-10 21:29:42.125234",
+ "modified": "2021-06-11 12:05:17.707009",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",

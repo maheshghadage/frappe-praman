@@ -2,6 +2,8 @@
 // MIT License. See license.txt
 
 frappe.listview_settings['User'] = {
+	 hide_name_column: true,
+	 hide_status_column: true,
 	add_fields: ["enabled", "user_type", "user_image"],
 	filters: [["enabled","=",1]],
 	prepare_data: function(data) {
@@ -14,6 +16,7 @@ frappe.listview_settings['User'] = {
 			return [__("Disabled"), "grey", "enabled,=,0"];
 		}
 	}
+	
 };
 
 frappe.help.youtube_id["User"] = "8Slw1hsTmUI";
