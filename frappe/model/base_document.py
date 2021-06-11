@@ -432,7 +432,10 @@ class BaseDocument(object):
 			frappe.msgprint(_("{0} must be unique").format(label or fieldname))
 
 		# this is used to preserve traceback
-		raise frappe.UniqueValidationError(self.doctype, self.name, e)
+		if self.doctype == "Customer":
+			raise frappe.UniqueValidationError(self.doctype, self.name, ("{0} must be unique").format(label or fieldname))
+		else:
+			raise frappe.UniqueValidationError(self.doctype, self.name, e)
 
 	def get_field_name_by_key_name(self, key_name):
 		"""MariaDB stores a mapping between `key_name` and `column_name`.

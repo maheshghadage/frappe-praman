@@ -176,10 +176,12 @@ def get_token(*args, **kwargs):
 		out = frappe._dict(json.loads(body))
 		if not out.error:
 			token_user = frappe.db.get_value("OAuth Bearer Token", out.access_token, "user")
+
 			uroles = frappe.get_roles(token_user) if token_user else []
 			if ("Field Sales Executive" not in uroles):
 				frappe.throw("login error")
-			out.update({"user": token_user})
+			user_full_name = frappe.db.get_value("User", token_user, "full_name")
+			out.update({"user": user_full_name})
 
 		if not out.error and "openid" in out.scope:
 			token_user = frappe.db.get_value("OAuth Bearer Token", out.access_token, "user")
