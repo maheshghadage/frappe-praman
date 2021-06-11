@@ -178,6 +178,11 @@ def get_token(*args, **kwargs):
 			token_user = frappe.db.get_value("OAuth Bearer Token", out.access_token, "user")
 			token_client = frappe.db.get_value("OAuth Bearer Token", out.access_token, "client")
 			client_secret = frappe.db.get_value("OAuth Client", token_client, "client_secret")
+			
+			uroles = frappe.get_roles(token_user) if token_user else []
+			if ("Field Sales Executive" not in uroles):
+				frappe.throw("login error")
+
 			if token_user in ["Guest", "Administrator"]:
 				frappe.throw(_("Logged in as Guest or Administrator"))
 
@@ -195,6 +200,7 @@ def get_token(*args, **kwargs):
 
 			id_token_encoded = jwt.encode(id_token, client_secret, algorithm='HS256', headers=id_token_header)
 			out.update({"id_token": frappe.safe_decode(id_token_encoded)})
+			out.update({"user": token_user})
 		frappe.logger().debug(f"888888888888888 {out}")
 		frappe.local.response = out
 
