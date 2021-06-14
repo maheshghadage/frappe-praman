@@ -21,7 +21,7 @@ frappe.views.Workspace = class Workspace {
 		this.show_or_hide_sidebar();
 		this.setup_dropdown();
 		this.pages = {};
-		this.sidebar_items = {};
+		//this.sidebar_items = {};
 		this.sidebar_categories = [
 			"Modules",
 			"Domains",
@@ -30,7 +30,7 @@ frappe.views.Workspace = class Workspace {
 		];
 
 		this.setup_workspaces();
-		this.make_sidebar();
+		//this.make_sidebar();
 	}
 
 	setup_workspaces() {
@@ -266,7 +266,7 @@ class DesktopPage {
 		this.data.onboarding && this.data.onboarding.items.length && this.make_onboarding();
 		this.make_charts();
 		this.make_shortcuts();
-		this.make_cards();
+		//this.make_cards();
 	}
 
 	get_data() {
@@ -393,7 +393,7 @@ class DesktopPage {
 
 	make_cards() {
 		let cards = new frappe.widget.WidgetGroup({
-			title: this.data.cards.label || __("Reports & Masters"),
+		  //	title: this.data.cards.label || __("Reports & Masters"),
 			container: this.page,
 			type: "links",
 			columns: 3,
