@@ -107,7 +107,7 @@ frappe.ui.form.States = Class.extend({
 									{doc: frm.doc, action: d.action, rejection_reason: args.rejection_reason})
 								.then((doc) => {
 									frappe.model.sync(doc);
-									frm.refresh();
+									frm.reload_doc();
 									frm.selected_workflow_action = null;
 									frm.script_manager.trigger("after_workflow_action");
 								});
@@ -124,7 +124,7 @@ frappe.ui.form.States = Class.extend({
 									{doc: frm.doc, action: d.action})
 								.then((doc) => {
 									frappe.model.sync(doc);
-									frm.refresh();
+									frm.reload_doc();
 									frm.selected_workflow_action = null;
 									frm.script_manager.trigger("after_workflow_action");
 								});
