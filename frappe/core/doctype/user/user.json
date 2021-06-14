@@ -7,6 +7,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "user_id",
   "enabled",
   "fse",
   "section_break_3",
@@ -84,7 +85,6 @@
   "generate_keys",
   "column_break_65",
   "api_secret",
-  "user_id",
   "section_break_78"
  ],
  "fields": [
@@ -622,12 +622,6 @@
    "label": "FSE"
   },
   {
-   "fieldname": "user_id",
-   "fieldtype": "Int",
-   "label": "user_id",
-   "read_only": 1
-  },
-  {
    "fieldname": "section_break_78",
    "fieldtype": "Section Break",
    "hidden": 1
@@ -638,6 +632,12 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Date ",
+   "read_only": 1
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Int",
+   "label": " User Id",
    "read_only": 1
   }
  ],
@@ -707,7 +707,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-11 12:05:17.707009",
+ "modified": "2021-06-11 17:19:50.620437",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
