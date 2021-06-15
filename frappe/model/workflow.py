@@ -77,59 +77,64 @@ def is_transition_condition_satisfied(transition, doc):
 def apply_workflow(doc, action, rejection_reason=None):
 	'''Allow workflow action on the current doc'''
 	# doc = frappe.get_doc(frappe.parse_json(doc))
-	parsed_json =  frappe.parse_json(doc)
-	doc = frappe.get_doc(parsed_json.get("doctype"), parsed_json.get("name"))
-	workflow = get_workflow(doc.doctype)
-	transitions = get_transitions(doc, workflow)
-	user = frappe.session.user
+	try:
 
-	# find the transition
-	transition = None
-	for t in transitions:
-		if t.action == action:
-			transition = t
+		parsed_json =  frappe.parse_json(doc)
+		doc = frappe.get_doc(parsed_json.get("doctype"), parsed_json.get("name"))
+		workflow = get_workflow(doc.doctype)
+		transitions = get_transitions(doc, workflow)
+		user = frappe.session.user
 
-	if not transition:
-		frappe.throw(_("Not a valid Workflow Action"), WorkflowTransitionError)
+		# find the transition
+		transition = None
+		for t in transitions:
+			if t.action == action:
+				transition = t
 
-	if not has_approval_access(user, doc, transition):
-		frappe.throw(_("Self approval is not allowed"))
+		if not transition:
+			frappe.throw(_("Not a valid Workflow Action"), WorkflowTransitionError)
 
-	# update workflow state field
-	doc.set(workflow.workflow_state_field, transition.next_state)
+		if not has_approval_access(user, doc, transition):
+			frappe.throw(_("Self approval is not allowed"))
 
-
-
-	# find settings for the next state
-	next_state = [d for d in workflow.states if d.state == transition.next_state][0]
+		# update workflow state field
+		doc.set(workflow.workflow_state_field, transition.next_state)
 
 
-	if(transition.next_state  ==  "Rejected"):
-		doc.set("rejection_reason", rejection_reason)
 
-	# update any additional field
-	if next_state.update_field:
-		doc.set(next_state.update_field, next_state.update_value)
+		# find settings for the next state
+		next_state = [d for d in workflow.states if d.state == transition.next_state][0]
 
-	new_docstatus = cint(next_state.doc_status)
-	if doc.docstatus == 0 and new_docstatus == 0:
-		doc.flags.ignore_permissions = True
-		doc.save()
-	elif doc.docstatus == 0 and new_docstatus == 1:
-		doc.flags.ignore_permissions = True
-		doc.submit()
-	elif doc.docstatus == 1 and new_docstatus == 1:
-		doc.flags.ignore_permissions = True
-		doc.save()
-	elif doc.docstatus == 1 and new_docstatus == 2:
-		doc.flags.ignore_permissions = True
-		doc.cancel()
-	else:
-		frappe.throw(_('Illegal Document Status for {0}').format(next_state.state))
 
-	doc.add_comment('Workflow', _(next_state.state))
+		if(transition.next_state  ==  "Rejected"):
+			doc.set("rejection_reason", rejection_reason)
 
-	return doc
+		# update any additional field
+		if next_state.update_field:
+			doc.set(next_state.update_field, next_state.update_value)
+
+		new_docstatus = cint(next_state.doc_status)
+		if doc.docstatus == 0 and new_docstatus == 0:
+			doc.flags.ignore_permissions = True
+			doc.save()
+		elif doc.docstatus == 0 and new_docstatus == 1:
+			doc.flags.ignore_permissions = True
+			doc.submit()
+		elif doc.docstatus == 1 and new_docstatus == 1:
+			doc.flags.ignore_permissions = True
+			doc.save()
+		elif doc.docstatus == 1 and new_docstatus == 2:
+			doc.flags.ignore_permissions = True
+			doc.cancel()
+		else:
+			frappe.throw(_('Illegal Document Status for {0}').format(next_state.state))
+
+		doc.add_comment('Workflow', _(next_state.state))
+
+		return doc
+	except Exception as e:
+		frappe.logger().debug(frappe.get_traceback())
+		raise e
 
 @frappe.whitelist()
 def can_cancel_document(doctype):
