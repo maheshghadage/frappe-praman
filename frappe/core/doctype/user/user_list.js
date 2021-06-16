@@ -15,7 +15,12 @@ frappe.listview_settings['User'] = {
 		} else {
 			return [__("Disabled"), "grey", "enabled,=,0"];
 		}
-	}
+	},
+	formatters: {
+	    user_id(val) {
+	    	return val.toString();
+	    },
+	},
 	
 };
 
