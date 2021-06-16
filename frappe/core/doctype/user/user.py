@@ -894,6 +894,7 @@ def reset_password(user):
 		user.validate_reset_password()
 		user.reset_password(send_email=True)
 
+		frappe.local.response['status'] = "success"
 		return frappe.msgprint(_("Password reset instructions have been sent to your email"))
 
 	except frappe.DoesNotExistError:
