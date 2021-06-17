@@ -85,7 +85,8 @@
   "generate_keys",
   "column_break_65",
   "api_secret",
-  "section_break_78"
+  "section_break_78",
+  "user_auto_id"
  ],
  "fields": [
   {
@@ -637,7 +638,15 @@
   {
    "fieldname": "user_id",
    "fieldtype": "Int",
-   "label": " User Id",
+   "hidden": 1,
+   "label": " User Id Auto",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "user_auto_id",
+   "fieldtype": "Data",
+   "label": "User ID",
    "read_only": 1
   }
  ],
@@ -707,7 +716,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-11 17:19:50.620437",
+ "modified": "2021-06-16 18:41:40.734069",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
@@ -739,6 +748,6 @@
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "title_field": "full_name",
+ "title_field": "user_auto_id",
  "track_changes": 1
 }
