@@ -638,12 +638,10 @@
   {
    "fieldname": "user_id",
    "fieldtype": "Int",
-   "hidden": 1,
    "label": " User Id Auto",
    "read_only": 1
   },
   {
-   "default": "0",
    "fieldname": "user_auto_id",
    "fieldtype": "Data",
    "label": "User ID",
@@ -716,7 +714,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-16 18:41:40.734069",
+ "modified": "2021-06-21 15:40:05.811329",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
