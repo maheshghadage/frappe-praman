@@ -25,7 +25,8 @@
   "unsubscribed",
   "user_image",
   "roles_all",
-  "date_created",
+  "fse_deactivate",
+  "date_time",
   "sb1",
   "role_profile_name",
   "roles_html",
@@ -250,8 +251,10 @@
   {
    "fieldname": "mobile_no",
    "fieldtype": "Data",
+   "in_standard_filter": 1,
    "label": "Mobile No",
    "options": "Phone",
+   "reqd": 1,
    "unique": 1
   },
   {
@@ -628,23 +631,32 @@
    "hidden": 1
   },
   {
-   "default": "Today",
-   "fieldname": "date_created",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Date ",
-   "read_only": 1
-  },
-  {
    "fieldname": "user_id",
    "fieldtype": "Int",
-   "label": " User Id Auto",
+   "hidden": 1,
+   "label": " User Id Autos",
    "read_only": 1
   },
   {
+   "default": "0",
    "fieldname": "user_auto_id",
    "fieldtype": "Data",
    "label": "User ID",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "fse_deactivate",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "FSE Deactivate"
+  },
+  {
+   "default": "Now",
+   "fieldname": "date_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Date",
    "read_only": 1
   }
  ],
@@ -714,7 +726,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-21 15:40:05.811329",
+ "modified": "2021-06-22 13:16:39.968818",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
