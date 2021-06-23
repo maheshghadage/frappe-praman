@@ -69,7 +69,7 @@ def make_notification_logs(doc, users):
 				_doc = frappe.new_doc('Notification Log')
 				_doc.update(doc)
 				_doc.for_user = user
-				if _doc.for_user != _doc.from_user or doc.type == 'Energy Point' or doc.type == 'Alert':
+				if _doc.for_user != _doc.from_user or doc.type == 'Energy Point' or doc.type == 'Alert' or doc.type == "WORKFLOWACTION":
 					_doc.insert(ignore_permissions=True)
 
 def send_notification_email(doc):

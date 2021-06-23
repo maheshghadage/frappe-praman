@@ -407,7 +407,7 @@ def msgprint(msg, title=None, raise_exception=0, as_table=False, as_list=False, 
 	message_log.append(json.dumps(out))
 
 	if raise_exception and hasattr(raise_exception, '__name__'):
-		local.response['status'] ="failure"
+		local.response['status'] = local.response.get('status') if local.response.get('status') else "failure"
 		local.response['exc_type'] = raise_exception.__name__
 
 	_raise_exception()

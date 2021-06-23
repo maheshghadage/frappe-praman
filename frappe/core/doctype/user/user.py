@@ -152,6 +152,11 @@ class User(Document):
 		if not cint(self.enabled) and getattr(frappe.local, "login_manager", None):
 			frappe.local.login_manager.logout(user=self.name)
 
+		if not cint(self.enabled):
+			user_tokens = frappe.get_list("OAuth Bearer Token", filters={"user": doc.name})
+			for user_token in user_tokens:
+				frappe.db.set_value("OAuth Bearer Token", user_token.get("name"), 'status', 'Revoked')
+
 		# toggle notifications based on the user's status
 		toggle_notifications(self.name, enable=cint(self.enabled))
 
@@ -894,6 +899,7 @@ def reset_password(user):
 		user.validate_reset_password()
 		user.reset_password(send_email=True)
 
+		frappe.local.response['status'] = "success"
 		return frappe.msgprint(_("Password reset instructions have been sent to your email"))
 
 	except frappe.DoesNotExistError:
