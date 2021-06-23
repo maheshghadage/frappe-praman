@@ -28,7 +28,7 @@ def is_email_notifications_enabled_for_type(user, notification_type):
 	if not is_email_notifications_enabled(user):
 		return False
 
-	if notification_type == 'Alert':
+	if notification_type == 'Alert' or notification_type == 'WORKFLOWACTION':
 		return False
 
 	fieldname = 'enable_email_' + frappe.scrub(notification_type)
