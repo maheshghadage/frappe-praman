@@ -153,7 +153,7 @@ class User(Document):
 			frappe.local.login_manager.logout(user=self.name)
 
 		if not cint(self.enabled):
-			user_tokens = frappe.get_list("OAuth Bearer Token", filters={"user": doc.name})
+			user_tokens = frappe.get_list("OAuth Bearer Token", filters={"user": self.name})
 			for user_token in user_tokens:
 				frappe.db.set_value("OAuth Bearer Token", user_token.get("name"), 'status', 'Revoked')
 
