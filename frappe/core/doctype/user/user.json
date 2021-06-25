@@ -174,7 +174,6 @@
    "fieldname": "username",
    "fieldtype": "Data",
    "in_global_search": 1,
-   "in_standard_filter": 1,
    "label": "Username",
    "unique": 1
   },
@@ -732,7 +731,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-22 18:05:19.828602",
+ "modified": "2021-06-25 14:17:03.205559",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
