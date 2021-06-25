@@ -687,6 +687,10 @@ class FilterArea {
 			},
 		];
 
+		if(this.list_view && this.list_view.doctype && ["Customer", "User"].includes(this.list_view.doctype)){
+			fields = [];
+		}
+
 		if (this.list_view.custom_filter_configs) {
 			this.list_view.custom_filter_configs.forEach((config) => {
 				config.onchange = () => this.refresh_list_view();
