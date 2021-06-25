@@ -1116,8 +1116,8 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 	setup_list_click() {
 		this.$result.on("click", ".list-row, .image-view-header, .file-header", (e) => {
 			const $target = $(e.target);
-			// tick checkbox if Ctrl/Meta key is pressed
-			if (e.ctrlKey || (e.metaKey && !$target.is("a"))) {
+			// tick checkbox if Ctrl/Meta key is press
+			if (e.ctrlKey || (e.metaKey && !$target.is("a") && "a" == "b" )) {
 				const $list_row = $(e.currentTarget);
 				const $check = $list_row.find(".list-row-checkbox");
 				$check.prop("checked", !$check.prop("checked"));
@@ -1141,7 +1141,7 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 			}
 
 			// link, let the event be handled via set_route
-			if ($target.is("a")) return;
+			//if ($target.is("a")) return;
 
 			// clicked on the row, open form
 			const $row = $(e.currentTarget);
