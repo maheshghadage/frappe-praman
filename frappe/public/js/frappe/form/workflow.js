@@ -120,14 +120,30 @@ frappe.ui.form.States = Class.extend({
 
 						}else{
 							frm.script_manager.trigger('before_workflow_action').then(() => {
-								frappe.xcall('frappe.model.workflow.apply_workflow',
-									{doc: frm.doc, action: d.action})
+								frappe.confirm('Are you sure you want to verify?',
+    									() => {
+    							frappe.xcall('frappe.model.workflow.apply_workflow',
+								{doc: me.frm.doc, action: d.action})
 								.then((doc) => {
+                                                                        frappe.model.sync(doc);
+                                                                        frm.reload_doc();
+                                                                        frm.selected_workflow_action = null;
+                                                                        frm.script_manager.trigger("after_workflow_action");
+                                                                });
+
+        						// action to perform if Yes is selected
+    							}, () => {
+								// console.log('136')
+        							// action to perform if No is selected
+    							})
+								//frappe.xcall('frappe.model.workflow.apply_workflow',
+								//	{doc: frm.doc, action: d.action})
+							/*	.then((doc) => {
 									frappe.model.sync(doc);
 									frm.reload_doc();
 									frm.selected_workflow_action = null;
 									frm.script_manager.trigger("after_workflow_action");
-								});
+								}); */
 							});
 							
 						}
