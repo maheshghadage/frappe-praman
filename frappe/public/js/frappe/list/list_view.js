@@ -1094,6 +1094,7 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 	setup_filterable() {
 		// filterable events
 		this.$result.on("click", ".filterable", (e) => {
+			return
 			if (e.metaKey || e.ctrlKey) return;
 			e.stopPropagation();
 			const $this = $(e.currentTarget);
@@ -1125,8 +1126,13 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 				return;
 			}
 			// don't open form when checkbox, like, filterable are clicked
+			// if (
+			// 	$target.hasClass("filterable") ||
+			// 	$target.hasClass("icon-heart") ||
+			// 	$target.is(":checkbox")
+			// ) {
+			
 			if (
-				$target.hasClass("filterable") ||
 				$target.hasClass("icon-heart") ||
 				$target.is(":checkbox")
 			) {
