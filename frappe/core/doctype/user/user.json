@@ -47,6 +47,7 @@
   "column_break_22",
   "change_password",
   "new_password",
+  "confirm_password",
   "logout_all_sessions",
   "reset_password_key",
   "last_password_reset_date",
@@ -87,7 +88,6 @@
   "generate_keys",
   "column_break_65",
   "api_secret",
-  "section_break_78",
   "user_auto_id"
  ],
  "fields": [
@@ -627,11 +627,6 @@
    "label": "FSE"
   },
   {
-   "fieldname": "section_break_78",
-   "fieldtype": "Section Break",
-   "hidden": 1
-  },
-  {
    "fieldname": "user_id",
    "fieldtype": "Int",
    "hidden": 1,
@@ -663,6 +658,13 @@
   {
    "fieldname": "column_break_21",
    "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.new_password",
+   "fieldname": "confirm_password",
+   "fieldtype": "Password",
+   "label": "Re-enter Password",
+   "mandatory_depends_on": "eval:doc.new_password"
   }
  ],
  "icon": "fa fa-user",
@@ -731,7 +733,7 @@
   }
  ],
  "max_attachments": 5,
- "modified": "2021-06-25 14:17:03.205559",
+ "modified": "2021-06-30 21:01:31.351648",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
