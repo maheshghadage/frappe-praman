@@ -62,10 +62,13 @@ class User(Document):
 
 		# clear new password
 		self.__new_password = self.new_password
+		self.__confirm_password = self.confirm_password
 		self.new_password = ""
+		self.confirm_password = ""
 
 		if not frappe.flags.in_test:
 			self.password_strength_test()
+			self.confirm_password_test()
 
 		if self.name not in STANDARD_USERS:
 			self.validate_email_type(self.email)
@@ -493,6 +496,10 @@ class User(Document):
 
 			self.username = ""
 
+	def confirm_password_test(self):
+		if self.__new_password:
+			confirm_password_check(self.__new_password, self.__confirm_password)
+
 	def password_strength_test(self):
 		""" test password strength """
 		if self.flags.ignore_password_policy:
@@ -604,6 +611,11 @@ def get_timezones():
 		"timezones": pytz.all_timezones
 	}
 
+@frappe.whitelist(allow_guest=True)
+def confirm_password_check(new_pass, confirm_pass):
+	if new_pass != confirm_pass:
+		frappe.throw("password confirmation not matching")
+
 @frappe.whitelist()
 def get_all_roles(arg=None):
 	"""return all roles"""
@@ -631,7 +643,7 @@ def get_perm_info(role):
 	return get_all_perms(role)
 
 @frappe.whitelist(allow_guest=True)
-def update_password(new_password, logout_all_sessions=0, key=None, old_password=None):
+def update_password(new_password, confirm_password, logout_all_sessions=0, key=None, old_password=None, ):
 	#validate key to avoid key input like ['like', '%'], '', ['in', ['']]
 	if key and not isinstance(key, str):
 		frappe.throw(_('Invalid key type'))
@@ -641,6 +653,8 @@ def update_password(new_password, logout_all_sessions=0, key=None, old_password=
 
 	if feedback and not feedback.get('password_policy_validation_passed', False):
 		handle_password_test_fail(result)
+
+	confirm_password_check(new_password, confirm_password)
 
 	res = _get_user_for_update_password(key, old_password)
 	if res.get('message'):
@@ -669,6 +683,8 @@ def update_password(new_password, logout_all_sessions=0, key=None, old_password=
 		return "/app"
 	else:
 		return redirect_url if redirect_url else "/"
+
+
 
 @frappe.whitelist(allow_guest=True)
 def test_password_strength(new_password, key=None, old_password=None, user_data=None):

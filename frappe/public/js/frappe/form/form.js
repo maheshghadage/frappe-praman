@@ -1697,3 +1697,11 @@ Object.defineProperty(window, 'validated', {
 		return frappe.validated;
 	}
 });
+$("body").on('click',".password-view-icon", function (e) {
+	e.stopPropagation();
+	e.preventDefault();
+	var $password_input = $(this).closest('div').find('input').first()
+	const type = $password_input.attr('type') === 'password' ? 'text' : 'password';
+	$password_input.attr('type', type);
+	$(this).toggleClass("fa-eye fa-eye-slash");
+});

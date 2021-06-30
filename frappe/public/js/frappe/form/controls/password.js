@@ -7,6 +7,7 @@ frappe.ui.form.ControlPassword = frappe.ui.form.ControlData.extend({
 		var me = this;
 		this._super();
 		this.$input.parent().append($('<span class="password-strength-indicator indicator"></span>'));
+		this.$input.parent().append($('<span class="password-view-icon fa fa-eye"></span>'));
 		this.$wrapper.find('.control-input-wrapper').append($('<p class="password-strength-message text-muted small hidden"></p>'));
 
 		this.indicator = this.$wrapper.find('.password-strength-indicator');
@@ -18,6 +19,9 @@ frappe.ui.form.ControlPassword = frappe.ui.form.ControlData.extend({
 				me.get_password_strength(me.$input.val());
 			}, 500);
 		});
+
+
+
 	},
 	get_password_strength: function(value) {
 		var me = this;
@@ -48,3 +52,5 @@ frappe.ui.form.ControlPassword = frappe.ui.form.ControlData.extend({
 		this.message.html(message).removeClass('hidden');
 	}
 });
+
+
