@@ -249,8 +249,8 @@ def resolve_path(path):
 		path = get_home_page()
 
 	frappe.local.path = path
-	if frappe.local.request.path.startswith("/verified_terms/"):
-		path = "verified_terms"
+	if frappe.local.request.path.startswith("/tnc/"):
+		path = "tnc"
 		frappe.local.no_cache = 1
 		frappe.local.tnc_hash = frappe.local.request.path.split("/")[2]
 		frappe.local.form_dict.update({"tnc_code": frappe.local.request.path.split("/")[2]})
