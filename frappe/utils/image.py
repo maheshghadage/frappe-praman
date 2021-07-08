@@ -36,8 +36,9 @@ def strip_exif_data(content, content_type):
 	
 	new_image = Image.new(original_image.mode, original_image.size)
 	new_image.putdata(list(original_image.getdata()))
+	if content_type.split('/')[1] == "jpeg" and new_image.mode in ("RGBA", "P"):
+		new_image = new_image.convert('RGB')
 	new_image.save(output, format=content_type.split('/')[1])
-	
 	content = output.getvalue()
 
 	return content
