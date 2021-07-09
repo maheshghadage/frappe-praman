@@ -198,6 +198,16 @@ class NotificationsView extends BaseNotificationsView {
 		});
 
 	}
+	
+	update_whole_dropdown(){
+		this.get_notifications_list(this.max_length).then(list => {
+			this.dropdown_items = list;
+			this.render_notifications_dropdown();
+			if (this.settings.seen == 0) {
+				this.toggle_notification_icon(false);
+			}
+		});
+	}
 
 	update_dropdown() {
 		this.get_notifications_list(1).then(r => {
@@ -357,7 +367,8 @@ class NotificationsView extends BaseNotificationsView {
 	setup_notification_listeners() {
 		frappe.realtime.on('notification', () => {
 			this.toggle_notification_icon(false);
-			this.update_dropdown();
+			this.update_whole_dropdown();
+			//this.update_dropdown();
 		});
 
 		frappe.realtime.on('indicator_hide', () => {
