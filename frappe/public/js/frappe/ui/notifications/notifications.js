@@ -198,6 +198,16 @@ class NotificationsView extends BaseNotificationsView {
 		});
 
 	}
+	
+	update_whole_dropdown(){
+		this.get_notifications_list(this.max_length).then(list => {
+			this.dropdown_items = list;
+			this.render_notifications_dropdown();
+			if (this.settings.seen == 0) {
+				this.toggle_notification_icon(false);
+			}
+		});
+	}
 
 	update_dropdown() {
 		this.get_notifications_list(1).then(r => {
@@ -329,10 +339,12 @@ class NotificationsView extends BaseNotificationsView {
 	}
 
 	get_item_link(notification_doc) {
-		const link_doctype =
-			notification_doc.type == 'Alert' ? 'Notification Log' : notification_doc.document_type;
-		const link_docname =
-			notification_doc.type == 'Alert' ? notification_doc.name : notification_doc.document_name;
+		// const link_doctype =
+		// 	notification_doc.type == 'Alert' ? 'Notification Log' : notification_doc.document_type;
+		// const link_docname =
+		// 	notification_doc.type == 'Alert' ? notification_doc.name : notification_doc.document_name;
+		const link_doctype = notification_doc.document_type;
+		const link_docname = notification_doc.document_name;
 		return frappe.utils.get_form_link(
 			link_doctype,
 			link_docname
@@ -357,7 +369,8 @@ class NotificationsView extends BaseNotificationsView {
 	setup_notification_listeners() {
 		frappe.realtime.on('notification', () => {
 			this.toggle_notification_icon(false);
-			this.update_dropdown();
+			this.update_whole_dropdown();
+			//this.update_dropdown();
 		});
 
 		frappe.realtime.on('indicator_hide', () => {
