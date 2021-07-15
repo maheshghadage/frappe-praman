@@ -656,6 +656,9 @@ def update_password(new_password, confirm_password, logout_all_sessions=0, key=N
 
 	confirm_password_check(new_password, confirm_password)
 
+
+
+
 	res = _get_user_for_update_password(key, old_password)
 	if res.get('message'):
 		frappe.local.response.http_status_code = 410
@@ -666,6 +669,12 @@ def update_password(new_password, confirm_password, logout_all_sessions=0, key=N
 	logout_all_sessions = cint(logout_all_sessions) or frappe.db.get_single_value("System Settings", "logout_on_password_reset")
 	_update_password(user, new_password, logout_all_sessions=cint(logout_all_sessions))
 
+	if cint(logout_all_sessions):
+		user_tokens = frappe.get_list("OAuth Bearer Token", filters={"user": user})
+		for user_token in user_tokens:
+			frappe.db.set_value("OAuth Bearer Token", user_token.get("name"), 'status', 'Revoked')
+			frappe.db.commit()
+
 	user_doc, redirect_url = reset_user_data(user)
 
 	# get redirect url from cache
@@ -674,7 +683,7 @@ def update_password(new_password, confirm_password, logout_all_sessions=0, key=N
 		redirect_url = redirect_to
 		frappe.cache().hdel('redirect_after_login', user)
 
-	frappe.local.login_manager.login_as(user)
+	# frappe.local.login_manager.login_as(user)
 
 	frappe.db.set_value("User", user, "last_password_reset_date", today())
 	frappe.db.set_value("User", user, "reset_password_key", "")
