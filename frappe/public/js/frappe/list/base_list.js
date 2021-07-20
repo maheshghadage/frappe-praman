@@ -687,7 +687,7 @@ class FilterArea {
 			},
 		];
 
-		if(this.list_view && this.list_view.doctype && ["Customer", "User"].includes(this.list_view.doctype)){
+		if(this.list_view && this.list_view.doctype && ["Customer", "User", "State", "District", "City", "Mandi"].includes(this.list_view.doctype)){
 			fields = [];
 		}
 
