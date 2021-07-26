@@ -31,6 +31,9 @@
 	</div>
 
 	<div class="sidebar-section filter-section">
+		{% if doctype != "State" %}
+		{% if doctype != "City" %}
+		{% if doctype != "District" %}
 		<li class="sidebar-label">
 			{{ __("Filter By") }}
 		</li>
@@ -66,9 +69,12 @@
 				<a class="list-tag-preview">{{ __("Show Tags") }}</a>
 			</li>
 		</div>
+		{% endif %}
+		{% endif %}
+		{% endif %}
 	</div>
 
-	<div class="sidebar-section save-filter-section">
+	<div class="sidebar-section save-filter-section hide">
 		<li class="sidebar-label">
 			{{ __("Save Filter") }}
 		</li>
