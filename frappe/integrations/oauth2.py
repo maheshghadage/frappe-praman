@@ -190,7 +190,6 @@ def get_token(*args, **kwargs):
 			
 			check_doctypes = ["Purchase Order","Customer"]
 			chek_permissions =['select', 'read', 'write', 'create', 'delete', 'submit', 'cancel', 'amend', 'print', 'email', 'report', 'import', 'export', 'set_user_permissions', 'share', "custom_read"]
-			web_pdb.set_trace()
 			for doctype in check_doctypes:
 				perms = {}
 				for ptype in chek_permissions:
