@@ -174,6 +174,9 @@ def get_token(*args, **kwargs):
 			)
 
 		out = frappe._dict(json.loads(body))
+
+		doc_permissions = []
+
 		if not out.error:
 			token_user = frappe.db.get_value("OAuth Bearer Token", out.access_token, "user")
 
@@ -182,6 +185,20 @@ def get_token(*args, **kwargs):
 				frappe.throw("login error")
 			user_full_name = frappe.db.get_value("User", token_user, "full_name")
 			out.update({"user": user_full_name})
+
+
+			
+			check_doctypes = ["Purchase Order","Customer"]
+			chek_permissions =['select', 'read', 'write', 'create', 'delete', 'submit', 'cancel', 'amend', 'print', 'email', 'report', 'import', 'export', 'set_user_permissions', 'share', "custom_read"]
+			web_pdb.set_trace()
+			for doctype in check_doctypes:
+				perms = {}
+				for ptype in chek_permissions:
+					perms[ptype] = bool(frappe.permissions.has_permission(doctype, user=token_user, ptype=ptype, raise_exception=False))
+				doc_permissions.append({doctype: perms})
+		
+		out.update({"permissions": doc_permissions})
+
 
 		if not out.error and "openid" in out.scope:
 			token_user = frappe.db.get_value("OAuth Bearer Token", out.access_token, "user")
