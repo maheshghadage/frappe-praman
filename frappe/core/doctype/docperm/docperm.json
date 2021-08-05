@@ -30,7 +30,8 @@
   "column_break_19",
   "share",
   "print",
-  "email"
+  "email",
+  "custom_read"
  ],
  "fields": [
   {
@@ -213,12 +214,18 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Select"
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_read",
+   "fieldtype": "Check",
+   "label": "Custom Read"
   }
  ],
  "idx": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-12-03 15:15:30.488212",
+ "modified": "2021-07-30 18:32:59.188709",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "DocPerm",

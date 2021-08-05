@@ -8,7 +8,7 @@ from frappe import _, msgprint
 from frappe.utils import cint
 import frappe.share
 rights = ("select", "read", "write", "create", "delete", "submit", "cancel", "amend",
-	"print", "email", "report", "import", "export", "set_user_permissions", "share")
+	"print", "email", "report", "import", "export", "set_user_permissions", "share", "custom_read")
 
 # TODO:
 
