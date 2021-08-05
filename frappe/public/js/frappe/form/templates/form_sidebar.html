@@ -48,9 +48,11 @@
 	</li>
 	<li class="flex flex-wrap">
 		<span class="assignments"></span>
+		{% if doctype!="Purchase Order" %}
 		<button class="text-muted btn btn-default icon-btn add-assignment-btn">
 			<svg class="icon icon-sm"><use href="#icon-add"></use></svg>
 		</button>
+		{% endif %}
 	</li>
 </ul>
 <ul class="list-unstyled sidebar-menu form-attachments">
@@ -87,9 +89,11 @@
 	</li>
 	<li class="flex flex-wrap">
 		<span class="shares"></span>
+		{% if doctype!="Purchase Order" %}
 		<button class="share-doc-btn text-muted btn btn-default icon-btn">
 			<svg class="icon icon-sm"><use href="#icon-add"></use></svg>
 		</button>
+		{% endif %}
 	</li>
 </ul>
 <ul class="list-unstyled sidebar-menu followed-by-section">

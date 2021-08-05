@@ -226,6 +226,7 @@ frappe.ui.form.AssignmentDialog = class {
 				'fieldname': 'user',
 				'fieldtype': 'Link',
 				'options': 'User',
+				'hidden': true,
 				'change': () => {
 					let value = this.dialog.get_value('user');
 					if (value && !this.assigning) {
