@@ -181,7 +181,7 @@ def get_token(*args, **kwargs):
 			token_user = frappe.db.get_value("OAuth Bearer Token", out.access_token, "user")
 
 			uroles = frappe.get_roles(token_user) if token_user else []
-			if ("Field Sales Executive" not in uroles) and ("FSE & Customer Edit" not in uroles):
+			if ("Field Sales Executive" not in uroles) and ("FSE & Customer Edit" not in uroles) and ("Operation Manager" not in uroles):
 				frappe.throw("login error")
 			user_full_name = frappe.db.get_value("User", token_user, "full_name")
 			out.update({"user": user_full_name})
