@@ -291,7 +291,7 @@ frappe.PermissionEngine = class PermissionEngine {
 
 	get rights() {
 		return ["select", "read", "write", "create", "delete", "submit", "cancel", "amend",
-			"print", "email", "report", "import", "export", "set_user_permissions", "share"];
+			"print", "email", "report", "import", "export", "set_user_permissions", "share", "custom_read"];
 	}
 
 	set_show_users(cell, role) {
