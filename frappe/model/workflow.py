@@ -73,8 +73,31 @@ def is_transition_condition_satisfied(transition, doc):
 	else:
 		return frappe.safe_eval(transition.condition, get_workflow_safe_globals(), dict(doc=doc.as_dict()))
 
+
+def set_workflow_history(doc,performed_by, method):
+	workflow_history = frappe.new_doc("Workflow History")
+	workflow_history.parent = doc.name
+	workflow_history.parenttype = doc.doctype
+	workflow_history.parentfield = "workflow_history"
+	if performed_by and doc.workflow_status in ('PO accepted by Buyer', 'PO rejected by Buyer', 'PO accepted by Seller', 'PO rejected by Seller', 'Proforma Invoice Accepted by Buyer', 'Proforma Invoice rejected by Buyer', 'Final Invoice Accepted by Buyer', 'Final Invoice rejected by Buyer'):
+		workflow_history.updated_by =  performed_by
+	else:
+		workflow_history.updated_by = frappe.session.user
+	workflow_history.idx = 1
+	if doc.doctype == "Purchase Order":
+		workflow_history.workflow_status =  doc.workflow_status
+	else:
+		workflow_history.workflow_status =  doc.status
+	frappe.logger("abcd").debug("aaaaaaaaaaaaaaa")
+	workflow_history.flags.ignore_permissions = True
+	workflow_history.insert()
+	frappe.db.commit()
+	frappe.logger("abcd").debug(f"bbbbbbbbbbbbbbbbb: {workflow_history}")
+
+
+
 @frappe.whitelist()
-def apply_workflow(doc, action, rejection_reason=None):
+def apply_workflow(doc, action, rejection_reason=None, performed_by=None):
 	'''Allow workflow action on the current doc'''
 	# doc = frappe.get_doc(frappe.parse_json(doc))
 	try:
@@ -99,7 +122,7 @@ def apply_workflow(doc, action, rejection_reason=None):
 
 		# update workflow state field
 		doc.set(workflow.workflow_state_field, transition.next_state)
-
+		set_workflow_history(doc,performed_by, None)
 
 
 		# find settings for the next state

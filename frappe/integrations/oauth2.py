@@ -188,15 +188,16 @@ def get_token(*args, **kwargs):
 
 
 			
-			check_doctypes = ["Purchase Order","Customer"]
+			check_doctypes = [["purchase_order", "Purchase Order"],["customer", "Customer"]]
 			chek_permissions =['select', 'read', 'write', 'create', 'delete', 'submit', 'cancel', 'amend', 'print', 'email', 'report', 'import', 'export', 'set_user_permissions', 'share', "custom_read"]
 			for doctype in check_doctypes:
 				perms = {}
 				for ptype in chek_permissions:
-					perms[ptype] = bool(frappe.permissions.has_permission(doctype, user=token_user, ptype=ptype, raise_exception=False))
-				doc_permissions.append({doctype: perms})
+					perms[ptype] = bool(frappe.permissions.has_permission(doctype[1], user=token_user, ptype=ptype, raise_exception=False))
+				doc_permissions.append({doctype[0]: perms})
 		
 		out.update({"permissions": doc_permissions})
+		out.update({"email":data_dict['username'][0]})
 
 
 		if not out.error and "openid" in out.scope:
