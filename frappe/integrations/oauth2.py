@@ -185,9 +185,8 @@ def get_token(*args, **kwargs):
 				frappe.throw("login error")
 			user_full_name = frappe.db.get_value("User", token_user, "full_name")
 			out.update({"user": user_full_name})
+			out.update({'email':  frappe.db.get_value("User", token_user, "email")})
 
-
-			
 			check_doctypes = [["purchase_order", "Purchase Order"],["customer", "Customer"]]
 			chek_permissions =['select', 'read', 'write', 'create', 'delete', 'submit', 'cancel', 'amend', 'print', 'email', 'report', 'import', 'export', 'set_user_permissions', 'share', "custom_read"]
 			for doctype in check_doctypes:
@@ -197,7 +196,8 @@ def get_token(*args, **kwargs):
 				doc_permissions.append({doctype[0]: perms})
 		
 		out.update({"permissions": doc_permissions})
-		out.update({"email":data_dict['username'][0]})
+		if  not(out.get('email')):
+			out.update({"email":data_dict['username'][0] if data_dict.get('username') else None }) 
 
 
 		if not out.error and "openid" in out.scope:
