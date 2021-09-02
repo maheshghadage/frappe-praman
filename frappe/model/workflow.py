@@ -22,7 +22,7 @@ def get_workflow_name(doctype):
 	return workflow_name
 
 @frappe.whitelist()
-def get_transitions(doc, workflow = None, raise_exception=False):
+def get_transitions(doc, workflow = None, raise_exception=False, ignore_role_check=False):
 	'''Return list of possible transitions for the given doc'''
 	doc = frappe.get_doc(frappe.parse_json(doc))
 
@@ -46,7 +46,7 @@ def get_transitions(doc, workflow = None, raise_exception=False):
 
 	transitions = []
 	for transition in workflow.transitions:
-		if transition.state == current_state and transition.allowed in roles:
+		if transition.state == current_state and (transition.allowed in roles or ignore_role_check):
 			if not is_transition_condition_satisfied(transition, doc):
 				continue
 			transitions.append(transition.as_dict())
@@ -94,10 +94,11 @@ def set_workflow_history(doc,performed_by, method):
 	frappe.db.commit()
 	frappe.logger("abcd").debug(f"bbbbbbbbbbbbbbbbb: {workflow_history}")
 
-
-
 @frappe.whitelist()
-def apply_workflow(doc, action, rejection_reason=None, performed_by=None):
+def apply_workflow(doc, action, rejection_reason=None,performed_by=None):
+	return custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,ignore_role_check=False)
+
+def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,ignore_role_check=False):
 	'''Allow workflow action on the current doc'''
 	# doc = frappe.get_doc(frappe.parse_json(doc))
 	try:
@@ -105,7 +106,7 @@ def apply_workflow(doc, action, rejection_reason=None, performed_by=None):
 		parsed_json =  frappe.parse_json(doc)
 		doc = frappe.get_doc(parsed_json.get("doctype"), parsed_json.get("name"))
 		workflow = get_workflow(doc.doctype)
-		transitions = get_transitions(doc, workflow)
+		transitions = get_transitions(doc, workflow, ignore_role_check=ignore_role_check)
 		user = frappe.session.user
 
 		# find the transition
