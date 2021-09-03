@@ -75,7 +75,9 @@ def as_raw():
 	return response
 
 def as_json():
-	if frappe.request.path.startswith("/api/method/praman_app"):
+	if frappe.request.path.startswith("/api/method/praman_app.utils.utils.api.get_order_details") or frappe.request.path.startswith("/api/method/praman_app.utils.utils.api.get_order_list") :
+		make_seller_buyer_api_logs()
+	elif frappe.request.path.startswith("/api/method/praman_app"):
 		make_api_logs()
 	else:
 		make_logs()
@@ -140,6 +142,17 @@ def make_logs(response = None):
 
 	if frappe.flags.error_message:
 		response['_error_message'] = frappe.flags.error_message
+
+def make_seller_buyer_api_logs(response = None):
+	"""make strings for msgprint and errprint"""
+	if not response:
+		response = frappe.local.response
+	if frappe.error_log :
+		response["success"] = response["success"] if response.get("success") else False
+		response["message"] = response["message"] if response.get("message") else "Internal Server error"
+	elif response.get('exc_type') or response.get('exc'):
+		response["success"] = response["success"] if response.get("success") else False
+		response["message"] = response["message"] if response.get("message") else "Internal Server error"
 
 def make_api_logs(response = None):
 	"""make strings for msgprint and errprint"""
