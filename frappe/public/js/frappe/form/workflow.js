@@ -90,6 +90,12 @@ frappe.ui.form.States = Class.extend({
 
 					added = true;
 					var frm = me.frm;
+					if d.action == "verify"{
+						var confirm_message = "Are you sure you want to verify?"
+					}else{
+						var confirm_message = "Are you sure?"
+					}
+					
 					me.frm.page.add_action_item(__(d.action), function() {
 						me.frm.selected_workflow_action = d.action;
 						if(d.action == "Reject"){
@@ -120,7 +126,7 @@ frappe.ui.form.States = Class.extend({
 
 						}else{
 							frm.script_manager.trigger('before_workflow_action').then(() => {
-								frappe.confirm('Are you sure you want to verify?',
+								frappe.confirm(confirm_message,
     									() => {
     							frappe.xcall('frappe.model.workflow.apply_workflow',
 								{doc: me.frm.doc, action: d.action})
