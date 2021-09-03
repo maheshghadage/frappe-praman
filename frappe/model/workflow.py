@@ -136,7 +136,7 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		# update any additional field
 		if next_state.update_field:
 			doc.set(next_state.update_field, next_state.update_value)
-
+ 
 		new_docstatus = cint(next_state.doc_status)
 		if doc.docstatus == 0 and new_docstatus == 0:
 			doc.flags.ignore_permissions = True
@@ -155,10 +155,79 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 
 		doc.add_comment('Workflow', _(next_state.state))
 
+		doc = appply_auto_workflows(doc, workflow)
+
 		return doc
 	except Exception as e:
 		frappe.logger().debug(frappe.get_traceback())
 		raise e
+
+def appply_auto_workflow(doc):
+	if doc.doctype != "Purchase Order": return doc
+	if doc.workflow_status == "Proforma Invoice Accepted by Buyer":
+		next_workflow_action = "Upload GRN"
+	if workflow_action = "Accept PO as Buyer":
+		next_workflow_action = "Send PO to Seller"
+
+	if not next_workflow_action: return doc
+	
+	current_state = doc.get(workflow.workflow_state_field)
+
+
+	transitions = []
+	for transition in workflow.transitions:
+		if transition.state == current_state and (transition.allowed in roles or ignore_role_check):
+			if not is_transition_condition_satisfied(transition, doc):
+				continue
+			transitions.append(transition.as_dict())
+	
+	transition = None
+	for t in transitions:
+		if t.action == next_workflow_action:
+			transition = t
+
+	if not transition:
+		frappe.throw(_("Not a valid Workflow Action"), WorkflowTransitionError)
+
+	if not has_approval_access(user, doc, transition):
+		frappe.throw(_("Self approval is not allowed"))
+
+	# update workflow state field
+	doc.set(workflow.workflow_state_field, transition.next_state)
+	set_workflow_history(doc,performed_by, None)
+
+
+	# find settings for the next state
+	next_state = [d for d in workflow.states if d.state == transition.next_state][0]
+
+
+	if(transition.next_state  ==  "Rejected"):
+		doc.set("rejection_reason", rejection_reason)
+
+	# update any additional field
+	if next_state.update_field:
+		doc.set(next_state.update_field, next_state.update_value)
+
+	new_docstatus = cint(next_state.doc_status)
+	if doc.docstatus == 0 and new_docstatus == 0:
+		doc.flags.ignore_permissions = True
+		doc.save()
+	elif doc.docstatus == 0 and new_docstatus == 1:
+		doc.flags.ignore_permissions = True
+		doc.submit()
+	elif doc.docstatus == 1 and new_docstatus == 1:
+		doc.flags.ignore_permissions = True
+		doc.save()
+	elif doc.docstatus == 1 and new_docstatus == 2:
+		doc.flags.ignore_permissions = True
+		doc.cancel()
+	else:
+		frappe.throw(_('Illegal Document Status for {0}').format(next_state.state))
+
+	doc.add_comment('Workflow', _(next_state.state))
+
+	return doc
+
 
 @frappe.whitelist()
 def can_cancel_document(doctype):
@@ -207,8 +276,15 @@ def validate_workflow(doc):
 			frappe.throw(_('Workflow State transition not allowed from {0} to {1}').format(bold_current, bold_next),
 				WorkflowPermissionError)
 
+
 		transitions = get_transitions(doc._doc_before_save)
+
 		transition = [d for d in transitions if d.next_state == next_state]
+
+		if doc.doctype == "Purchase Order" and not transition:
+			if next_state == "GRN Uploaded by Fse" and current_state == "Proforma Invoice Sent to Buyer":
+				transition = [d for d in transitions if d.next_state == "Proforma Invoice Accepted by Buyer"]
+
 		if not transition:
 			frappe.throw(_('Workflow State transition not allowed from {0} to {1}').format(bold_current, bold_next),
 				WorkflowPermissionError)
