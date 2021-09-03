@@ -114,7 +114,7 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		for t in transitions:
 			if t.action == action:
 				transition = t
-
+		frappe.logger("testlog").debug("8888888888888888888888888888888888888888action: {action}")
 		if not transition:
 			frappe.throw(_("Not a valid Workflow Action"), WorkflowTransitionError)
 
@@ -155,25 +155,29 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 
 		doc.add_comment('Workflow', _(next_state.state))
 
-		doc = appply_auto_workflows(doc, workflow)
+		doc = appply_auto_workflow(doc, workflow,performed_by)
 
 		return doc
 	except Exception as e:
-		frappe.logger().debug(frappe.get_traceback())
+		frappe.logger('testlog').debug(frappe.get_traceback())
 		raise e
 
-def appply_auto_workflow(doc):
+def appply_auto_workflow(doc, workflow,performed_by):
 	if doc.doctype != "Purchase Order": return doc
+	next_workflow_action = None
 	if doc.workflow_status == "Proforma Invoice Accepted by Buyer":
 		next_workflow_action = "Upload GRN"
-	if workflow_action = "Accept PO as Buyer":
+	if doc.workflow_status == "PO accepted by Buyer":
 		next_workflow_action = "Send PO to Seller"
 
 	if not next_workflow_action: return doc
+	user = frappe.session.user
 	
 	current_state = doc.get(workflow.workflow_state_field)
 
-
+	frappe.has_permission(doc, 'read', throw=True)
+	roles = frappe.get_roles()
+	
 	transitions = []
 	for transition in workflow.transitions:
 		if transition.state == current_state and (transition.allowed in roles or ignore_role_check):
