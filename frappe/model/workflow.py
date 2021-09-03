@@ -155,18 +155,20 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 
 		doc.add_comment('Workflow', _(next_state.state))
 
-		doc = appply_auto_workflow(doc, workflow,performed_by)
+		if doc.doctype == "Purchase Order":
+			doc = apply_auto_workflow(doc, workflow,performed_by)
 
 		return doc
 	except Exception as e:
 		frappe.logger('testlog').debug(frappe.get_traceback())
 		raise e
 
-def appply_auto_workflow(doc, workflow,performed_by):
-	if doc.doctype != "Purchase Order": return doc
+def apply_auto_workflow(doc, workflow,performed_by):
 	next_workflow_action = None
 	if doc.workflow_status == "Proforma Invoice Accepted by Buyer":
-		next_workflow_action = "Upload GRN"
+		if doc.received_quantity and doc.goods_received_notee and doc.rejection_quantity and doc.final_quantity:
+			next_workflow_action = "Upload GRN"
+
 	if doc.workflow_status == "PO accepted by Buyer":
 		next_workflow_action = "Send PO to Seller"
 
@@ -286,8 +288,10 @@ def validate_workflow(doc):
 		transition = [d for d in transitions if d.next_state == next_state]
 
 		if doc.doctype == "Purchase Order" and not transition:
-			if next_state == "GRN Uploaded by Fse" and current_state == "Proforma Invoice Sent to Buyer":
-				transition = [d for d in transitions if d.next_state == "Proforma Invoice Accepted by Buyer"]
+			if next_state == "GRN Uploaded by Fse" and (current_state == "Proforma Invoice Sent to Buyer"):
+				return
+			if next_state == "PO sent to Seller" and (current_state == "PO sent to Buyer"):
+				return
 
 		if not transition:
 			frappe.throw(_('Workflow State transition not allowed from {0} to {1}').format(bold_current, bold_next),
