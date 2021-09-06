@@ -74,10 +74,11 @@ def is_transition_condition_satisfied(transition, doc):
 		return frappe.safe_eval(transition.condition, get_workflow_safe_globals(), dict(doc=doc.as_dict()))
 
 
-def set_workflow_history(doc,performed_by, method):
+def set_workflow_history(doc,performed_by, method, reason):
 	workflow_history = frappe.new_doc("Workflow History")
 	workflow_history.parent = doc.name
 	workflow_history.parenttype = doc.doctype
+	workflow_history.parentfield = "workflow_history"
 	workflow_history.parentfield = "workflow_history"
 	if performed_by and doc.workflow_status in ('PO accepted by Buyer', 'PO rejected by Buyer', 'PO accepted by Seller', 'PO rejected by Seller', 'Proforma Invoice Accepted by Buyer', 'Proforma Invoice rejected by Buyer', 'Final Invoice Accepted by Buyer', 'Final Invoice rejected by Buyer'):
 		workflow_history.updated_by =  performed_by
@@ -123,8 +124,7 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 
 		# update workflow state field
 		doc.set(workflow.workflow_state_field, transition.next_state)
-		set_workflow_history(doc,performed_by, None)
-
+		set_workflow_history(doc,performed_by, None, rejection_reason)
 
 		# find settings for the next state
 		next_state = [d for d in workflow.states if d.state == transition.next_state][0]
@@ -132,6 +132,10 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 
 		if(transition.next_state  ==  "Rejected"):
 			doc.set("rejection_reason", rejection_reason)
+
+		if doc.doctype == "Purchase Order":
+			if(transition.next_state  ==  "GRN rejected by Finance"):
+				doc.set("grn_rejection_reason", rejection_reason)
 
 		# update any additional field
 		if next_state.update_field:
@@ -200,7 +204,7 @@ def apply_auto_workflow(doc, workflow,performed_by):
 
 	# update workflow state field
 	doc.set(workflow.workflow_state_field, transition.next_state)
-	set_workflow_history(doc,performed_by, None)
+	set_workflow_history(doc,performed_by, None, rejection_reason)
 
 
 	# find settings for the next state
@@ -209,6 +213,10 @@ def apply_auto_workflow(doc, workflow,performed_by):
 
 	if(transition.next_state  ==  "Rejected"):
 		doc.set("rejection_reason", rejection_reason)
+
+	if doc.doctype == "Purchase Order":
+		if(transition.next_state  ==  "GRN rejected by Finance"):
+			doc.set("grn_rejection_reason", rejection_reason)
 
 	# update any additional field
 	if next_state.update_field:

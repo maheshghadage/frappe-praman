@@ -98,7 +98,7 @@ frappe.ui.form.States = Class.extend({
 					
 					me.frm.page.add_action_item(__(d.action), function() {
 						me.frm.selected_workflow_action = d.action;
-						if(d.action == "Reject"){
+						if(d.action == "Reject" || d.action == "Reject GRN"){
 							frappe.prompt([
 							{
 								fieldtype: 'Small Text',
@@ -119,7 +119,7 @@ frappe.ui.form.States = Class.extend({
 								});
 								
 							},
-							__('Reason for ') + frm.doc.workflow_state,
+							__('Reason'),
 							__('Reject')
 							)
 
@@ -141,7 +141,7 @@ frappe.ui.form.States = Class.extend({
     							}, () => {
 								// console.log('136')
         							// action to perform if No is selected
-    							})
+    							}) 
 								//frappe.xcall('frappe.model.workflow.apply_workflow',
 								//	{doc: frm.doc, action: d.action})
 							/*	.then((doc) => {
