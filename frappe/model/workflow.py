@@ -160,14 +160,14 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		doc.add_comment('Workflow', _(next_state.state))
 
 		if doc.doctype == "Purchase Order":
-			doc = apply_auto_workflow(doc, workflow,performed_by)
+			doc = apply_auto_workflow(doc, workflow,rejection_reason,performed_by)
 
 		return doc
 	except Exception as e:
 		frappe.logger('testlog').debug(frappe.get_traceback())
 		raise e
 
-def apply_auto_workflow(doc, workflow,performed_by):
+def apply_auto_workflow(doc, workflow,rejection_reason=None, performed_by=None):
 	next_workflow_action = None
 	if doc.workflow_status == "Proforma Invoice Accepted by Buyer":
 		if doc.received_quantity and doc.goods_received_notee and doc.rejection_quantity and doc.final_quantity:
