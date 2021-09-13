@@ -92,12 +92,12 @@ def set_workflow_history(doc,performed_by, method, reason):
 	frappe.logger("abcd").debug("aaaaaaaaaaaaaaa")
 	workflow_history.flags.ignore_permissions = True
 	workflow_history.insert()
-	frappe.db.commit()
+	#frappe.db.commit()
 	frappe.logger("abcd").debug(f"bbbbbbbbbbbbbbbbb: {workflow_history}")
 
 @frappe.whitelist()
 def apply_workflow(doc, action, rejection_reason=None,performed_by=None):
-	return custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,ignore_role_check=False)
+	return custom_apply_workflow(doc, action, rejection_reason,performed_by,ignore_role_check=False)
 
 def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,ignore_role_check=False):
 	'''Allow workflow action on the current doc'''
@@ -115,7 +115,7 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		for t in transitions:
 			if t.action == action:
 				transition = t
-		frappe.logger("testlog").debug("8888888888888888888888888888888888888888action: {action}")
+		frappe.logger("testlog").debug(f"8888888888888888888888888888888888888888action: {action}")
 		if not transition:
 			frappe.throw(_("Not a valid Workflow Action"), WorkflowTransitionError)
 
@@ -132,11 +132,14 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 
 		if(transition.next_state  ==  "Rejected"):
 			doc.set("rejection_reason", rejection_reason)
-
+		
+		frappe.logger('testlog').debug("aaaaaaaaaaaaaaa 1111111111111")
 		if doc.doctype == "Purchase Order":
+			frappe.logger('testlog').debug("1111111111111111111111")
 			if(transition.next_state  ==  "GRN rejected by Finance"):
+				frappe.logger('testlog').debug("222222222222222222222")
 				doc.set("grn_rejection_reason", rejection_reason)
-
+				frappe.logger('testlog').debug(f"grn_rejection_reaosn: {doc.grn_rejection_reason}, resje: {rejection_reason}")
 		# update any additional field
 		if next_state.update_field:
 			doc.set(next_state.update_field, next_state.update_value)
@@ -170,7 +173,7 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 def apply_auto_workflow(doc, workflow,rejection_reason=None, performed_by=None):
 	next_workflow_action = None
 	if doc.workflow_status == "Proforma Invoice Accepted by Buyer":
-		if doc.received_quantity and doc.goods_received_notee and doc.rejection_quantity and doc.final_quantity:
+		if doc.received_quantity and doc.goods_received_notee and (doc.rejection_quantity or int(doc.rejection_quantity) == 0) and doc.final_quantity:
 			next_workflow_action = "Upload GRN"
 
 	if doc.workflow_status == "PO accepted by Buyer":
