@@ -46,6 +46,17 @@
 	}
 }
 
+.actionable-row-color {
+	background-color: #ee8484;
+}
+
+.list-row-container.actionable-row-color .list-row {
+	&:hover:not(.list-row-head) {
+		background-color: #e6cccc;
+	}
+}
+
+
 .list-row-container {
 	border-bottom: 1px solid $border-color;
 	display: flex;
