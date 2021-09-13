@@ -646,13 +646,15 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 	get_list_row_html(doc) {
 		return this.get_list_row_html_skeleton(
 			this.get_left_html(doc),
-			this.get_right_html(doc)
+			this.get_right_html(doc),
+			(doc.hasOwnProperty('workflow_status') && ["Pending Approval", "PO rejected by Buyer", "PO rejected by Seller", "PO accepted by Seller", "Proforma Invoice rejected by Buyer", "GRN uploaded by FSE", "GRN accepted by Finance", "Final Invoice rejected by Buyer", "Final Invoice Accepted by Buyer", "Rejected by Finance"].includes(doc.workflow_status) ) ? "actionable-row-color" : ""
+
 		);
 	}
 
-	get_list_row_html_skeleton(left = "", right = "") {
+	get_list_row_html_skeleton(left = "", right = "", parent_row_class="") {
 		return `
-			<div class="list-row-container" tabindex="1">
+			<div class="list-row-container ${parent_row_class}" tabindex="1">
 				<div class="level list-row">
 					<div class="level-left ellipsis">
 						${left}
@@ -830,6 +832,15 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 		</div>`;
 
 		let assigned_users = JSON.parse(doc._assign || "[]");
+		//custom code
+		if (this.doctype=="Purchase Order"){
+			let assigned_users=[]
+			if (doc.hasOwnProperty('selller_side_fse') && doc.hasOwnProperty('buyer_side_fse')){
+				assigned_users.push(doc.selller_side_fse)
+				assigned_users.push(doc.buyer_side_fse)
+			}
+		
+		}
 		if (assigned_users.length) {
 			assigned_to = `<div class="list-assignments">
 					${frappe.avatar_group(assigned_users, 3, { filterable: true })[0].outerHTML}
