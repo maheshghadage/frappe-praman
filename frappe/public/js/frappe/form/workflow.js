@@ -90,10 +90,10 @@ frappe.ui.form.States = Class.extend({
 
 					added = true;
 					var frm = me.frm;
-					if d.action == "verify"{
-						var confirm_message = "Are you sure you want to verify?"
+					if(d.action == "verify"){
+						var confirm_message = "Are you sure you want to verify?";
 					}else{
-						var confirm_message = "Are you sure?"
+						var confirm_message = "Are you sure?";
 					}
 					
 					me.frm.page.add_action_item(__(d.action), function() {
