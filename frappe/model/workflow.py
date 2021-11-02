@@ -7,6 +7,7 @@ from frappe.utils import cint
 from frappe import _
 from six import string_types
 import json
+from frappe.utils import now
 
 class WorkflowStateError(frappe.ValidationError): pass
 class WorkflowTransitionError(frappe.ValidationError): pass
@@ -125,7 +126,8 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		# update workflow state field
 		doc.set(workflow.workflow_state_field, transition.next_state)
 		set_workflow_history(doc,performed_by, None, rejection_reason)
-
+		if doc.doctype == "Customer" and  doc.status ==  "Verified":
+			doc.set("verification_date", now())
 		# find settings for the next state
 		next_state = [d for d in workflow.states if d.state == transition.next_state][0]
 
