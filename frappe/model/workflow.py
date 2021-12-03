@@ -170,7 +170,23 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		return doc
 	except Exception as e:
 		frappe.logger('testlog').debug(frappe.get_traceback())
+		frappe.db.rollback()
+		#frappe.db.begin()
+		#doc.db_set("razor_customer_id", "abcdxyz")
+		#frappe.db.commit()
+		frappe.db.begin()
 		raise e
+	finally:
+		frappe.logger("finally_logs").debug(f"------------------ In Finally logs --- ")
+		
+		if getattr(frappe.local, 'custom_razor_customer_id', None):
+			frappe.logger("finally_logs").debug(f"setting razor customer_id to rid: {getattr(frappe.local, 'custom_razor_customer_id', None)}")
+			doc.db_set("razor_customer_id", getattr(frappe.local, 'custom_razor_customer_id', None))
+		if getattr(frappe.local, 'custom_razor_customer_response', None):
+			frappe.logger("finally_logs").debug(f"setting razor customer response: {getattr(frappe.local, 'custom_razor_customer_response', None)}")
+			doc.db_set("razor_customer_response", getattr(frappe.local, 'custom_razor_customer_response', None))
+		frappe.db.commit()
+		frappe.db.begin
 
 def apply_auto_workflow(doc, workflow,rejection_reason=None, performed_by=None):
 	next_workflow_action = None
