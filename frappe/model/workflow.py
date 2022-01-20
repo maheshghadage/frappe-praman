@@ -127,7 +127,10 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		doc.set(workflow.workflow_state_field, transition.next_state)
 		set_workflow_history(doc,performed_by, None, rejection_reason)
 		if doc.doctype == "Customer" and  doc.status ==  "Verified":
-			doc.set("verification_date", now())
+			verify_time_date=str(now())
+			verify_split=verify_time_date.split(" ")
+			doc.set("verification_date",verify_split[0])
+			doc.set("verification_time",verify_split[1])
 		# find settings for the next state
 		next_state = [d for d in workflow.states if d.state == transition.next_state][0]
 
