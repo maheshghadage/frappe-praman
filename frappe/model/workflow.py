@@ -188,8 +188,31 @@ def custom_apply_workflow(doc, action, rejection_reason=None,performed_by=None,i
 		if getattr(frappe.local, 'custom_razor_customer_response', None):
 			frappe.logger("finally_logs").debug(f"setting razor customer response: {getattr(frappe.local, 'custom_razor_customer_response', None)}")
 			doc.db_set("razor_customer_response", getattr(frappe.local, 'custom_razor_customer_response', None))
+		# virtual account response attributes
+		if getattr(frappe.local, 'custom_virtual_account_response', None):
+			doc.db_set("virtual_account_response", getattr(frappe.local, 'custom_virtual_account_response', None))
+		if getattr(frappe.local, 'custom_va_id', None):
+			doc.db_set("va_id", getattr(frappe.local, 'custom_va_id', None))
+		if getattr(frappe.local, 'custom_receiver_ifsc', None):
+			doc.db_set("receiver_ifsc", getattr(frappe.local, 'custom_receiver_ifsc', None))
+		if getattr(frappe.local, 'custom_receiver_bank_name', None):
+			doc.db_set("receiver_bank_name", getattr(frappe.local, 'custom_receiver_bank_name', None))
+		if getattr(frappe.local, 'custom_receiver_name', None):
+			doc.db_set("receiver_name", getattr(frappe.local, 'custom_receiver_name', None))
+		if getattr(frappe.local, 'custom_receiver_account_number', None):
+			doc.db_set("receiver_account_number", getattr(frappe.local, 'custom_receiver_account_number', None))
+		if getattr(frappe.local, 'custom_receiver_id', None):
+			doc.db_set("receiver_id", getattr(frappe.local, 'custom_receiver_id', None))
+		if getattr(frappe.local, 'custom_entity', None):
+			doc.db_set("entity", getattr(frappe.local, 'custom_entity', None))
+		if getattr(frappe.local, 'custom_receiver_username', None):
+			doc.db_set("receiver_username", getattr(frappe.local, 'custom_receiver_username', None))
+		if getattr(frappe.local, 'custom_receiver_handle', None):
+			doc.db_set("receiver_handle", getattr(frappe.local, 'custom_receiver_handle', None))
+		if getattr(frappe.local, 'custom_receiver_address', None):
+			doc.db_set("receiver_address", getattr(frappe.local, 'custom_receiver_address', None))
 		frappe.db.commit()
-		frappe.db.begin
+		frappe.db.begin()
 
 def apply_auto_workflow(doc, workflow,rejection_reason=None, performed_by=None):
 	next_workflow_action = None
