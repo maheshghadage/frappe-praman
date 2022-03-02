@@ -306,7 +306,9 @@ class DataExporter:
 						self.add_data_row(rows, c['doctype'], c['parentfield'], child, ci)
 
 			for row in rows:
-				self.writer.writerow(row)
+				empty_row="".join([str(i) for i in row])
+				if len(empty_row)!=0:
+					self.writer.writerow(row)
 
 	def add_data_row(self, rows, dt, parentfield, doc, rowidx):
 		d = doc.copy()
